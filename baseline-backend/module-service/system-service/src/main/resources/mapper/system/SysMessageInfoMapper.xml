@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysMessageInfoMapper">
+
+    <select id="paging" resultType="com.baseline.system.vo.SysMessageInfoVO">
+        SELECT * FROM sys_message_info t
+        <where>
+            <if test="dto.oneCategory != null">
+                AND t.one_category=#{dto.oneCategory}
+            </if>
+            <if test="dto.userType != null">
+                AND t.user_type= #{dto.userType}
+            </if>
+            <if test="dto.userId != null">
+                AND t.user_id= #{dto.userId}
+            </if>
+            AND t.deleted=0
+        </where>
+        ORDER BY t.read_status, t.create_time DESC
+    </select>
+
+    <select id="numOverview" resultType="com.baseline.system.vo.SysMessageTypeNumVO">
+        select one_category, count(*) as `count`
+        from sys_message_info
+        WHERE deleted=0 and user_id = #{userId}
+        group by one_category
+        order by one_category
+    </select>
+
+
+    <select id="getList" resultType="com.baseline.system.vo.SysMessageInfoVO">
+        SELECT * FROM sys_message_info t
+        <where>
+            AND t.deleted=0
+        </where>
+    </select>
+
+    <select id="exportData" resultType="com.baseline.system.vo.SysMessageInfoExportVO">
+        SELECT * FROM sys_message_info t
+        <where>
+            AND t.deleted=0
+        </where>
+    </select>
+</mapper>

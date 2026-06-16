@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.baseline</groupId>
+    <artifactId>cloud-common</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  <artifactId>cloud-common-swagger</artifactId>
+  <version>1.0.0</version>
+  <description>Swagger common components</description>
+  <dependencies>
+    <dependency>
+      <groupId>com.baseline</groupId>
+      <artifactId>cloud-common-core</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.swagger</groupId>
+      <artifactId>swagger-annotations</artifactId>
+      <version>1.6.14</version>
+    </dependency>
+  </dependencies>
+</project>

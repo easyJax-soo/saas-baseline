@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysProjectMapper">
+
+    <!-- 分页查询项目列表 -->
+    <select id="pageProject" resultType="com.baseline.system.vo.SysProjectPageVO">
+        SELECT 
+            p.id,
+            p.code,
+            p.name,
+            p.description,
+            p.project_type as projectType,
+            p.url,
+            p.logo,
+            p.icon,
+            p.sort_no as sortNo,
+            p.status,
+            p.is_default as isDefault,
+            p.target,
+            p.create_time as createTime,
+            p.update_time as updateTime,
+            p.remark
+        FROM sys_project p
+        WHERE p.deleted = 0
+        <if test="dto.name != null and dto.name != ''">
+            AND p.name LIKE CONCAT('%', #{dto.name}, '%')
+        </if>
+        <if test="dto.code != null and dto.code != ''">
+            AND p.code = #{dto.code}
+        </if>
+        <if test="dto.projectType != null and dto.projectType != ''">
+            AND p.project_type = #{dto.projectType}
+        </if>
+        <if test="dto.status != null">
+            AND p.status = #{dto.status}
+        </if>
+        <if test="dto.isDefault != null">
+            AND p.is_default = #{dto.isDefault}
+        </if>
+        ORDER BY p.sort_no ASC, p.create_time DESC
+    </select>
+
+</mapper>

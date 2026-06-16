@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysTenantPermissionMapper">
+
+    <select id="getTenantPermission" resultType="com.baseline.system.vo.SysTenantPermissionVO">
+        SELECT
+            p.id,
+            p.`name`,
+            p.permission
+        FROM sys_tenant_permission as tp
+                 LEFT JOIN sys_permission as p on p.id = tp.permission_id
+        WHERE tp.tenant_id = #{tenantId}
+    </select>
+    
+    
+    <!-- 多租户拦截器会自动在sys_tenant_permission表上添加tenant_id条件 -->
+    <select id="selectTenantPermission" resultType="com.baseline.system.vo.SysTenantPermissionVO">
+        select p.*, tp.`id` as tenant_permission_id
+        from sys_permission as p
+        inner join sys_tenant_permission as tp on tp.permission_id = p.id
+          and p.deleted = 0
+        order by p.sort_no
+    </select>
+
+    <!-- 查询指定租户的权限（用于系统管理员查询其他租户资源） -->
+    <select id="selectTenantPermissionByTenantId" resultType="com.baseline.system.vo.SysTenantPermissionVO">
+        select p.*, tp.`id` as tenant_permission_id
+        from sys_permission as p
+        inner join sys_tenant_permission as tp on tp.permission_id = p.id
+          and p.deleted = 0
+          and tp.tenant_id = #{tenantId}
+        order by p.sort_no
+    </select>
+
+</mapper>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysUserMapper">
+
+
+    <select id="pageUser" resultType="com.baseline.system.vo.PageSysUserVO">
+        select `u`.`id`,`u`.`account`, `u`.`name`, `u`.`phone`, `u`.`status`, `u`.`create_time`, `d`.`name` as `dept_name`, `d`.`id` as `dept_id`
+        from sys_user as u
+        left join sys_dept as d on `d`.`id` = `u`.`dept_id`
+        <where>
+            <if test="dto.name!='' and dto.name!=null">
+                `u`.`name` like concat("%",#{dto.name},"%")
+            </if>
+            <if test="dto.phone!='' and dto.phone!=null">
+                and `u`.`phone` like concat("%",#{dto.phone},"%")
+            </if>
+            <if test="dto.status!=null">
+                and `u`.`status`=#{dto.status}
+            </if>
+            <if test="dto.status==null">
+                and `u`.`status`=1
+            </if>
+            <if test="dto.deptId!=null">
+                and u.`dept_id`=#{dto.deptId}
+            </if>
+            <if test="dto.beginTime!=null">
+                and `u`.`create_time` &gt;= #{dto.beginTime}
+            </if>
+            <if test="dto.endTime!=null">
+                and `u`.`create_time` &lt;= #{dto.endTime}
+            </if>
+            and `u`.`deleted`=0
+        </where>
+        order by `u`.`create_time` desc
+    </select>
+
+    <select id="pageTenantUser" resultType="com.baseline.system.vo.PageSysUserVO">
+        select `u`.`id`,`u`.`account`, `u`.`name`, `u`.`phone`, `u`.`status`, `u`.`create_time`, `d`.`name` as `dept_name`, `d`.`id` as `dept_id`
+        from sys_user as u
+        inner join sys_tenant_user as tu on `u`.`id` = `tu`.`user_id` and `tu`.`status` = 1
+        left join sys_dept as d on `d`.`id` = `u`.`dept_id`
+        <where>
+            <if test="dto.name!='' and dto.name!=null">
+                `u`.`name` like concat("%",#{dto.name},"%")
+            </if>
+            <if test="dto.phone!='' and dto.phone!=null">
+                and `u`.`phone` like concat("%",#{dto.phone},"%")
+            </if>
+            <if test="dto.status!=null">
+                and `u`.`status`=#{dto.status}
+            </if>
+            <if test="dto.status==null">
+                and `u`.`status`=1
+            </if>
+            <if test="dto.deptId!=null">
+                and u.`dept_id`=#{dto.deptId}
+            </if>
+            <if test="dto.beginTime!=null">
+                and `u`.`create_time` &gt;= #{dto.beginTime}
+            </if>
+            <if test="dto.endTime!=null">
+                and `u`.`create_time` &lt;= #{dto.endTime}
+            </if>
+            and `u`.`deleted`=0
+        </where>
+        order by `u`.`create_time` desc
+    </select>
+    <select id="getSimpleList" resultType="com.baseline.system.vo.SysUserVO">
+        select t.id, t.name, t.phone, t.avatar from sys_user t
+        <where>
+            <if test="ids!=null and ids.size()>0">
+                and t.id in
+                <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="name!='' and name!=null">
+                t.`name` like concat("%",#{name},"%")
+            </if>
+            <if test="phone!='' and phone!=null">
+                and t.`phone` like concat("%",#{phone},"%")
+            </if>
+            <if test="status!=null">
+                and t.`status`=#{status}
+            </if>
+            <if test="status==null">
+                and t.`status`=1
+            </if>
+            <if test="deptId!=null">
+                and t.`dept_id`=#{deptId}
+            </if>
+            <if test="beginTime!=null">
+                and t.`create_time` &gt;= #{beginTime}
+            </if>
+            <if test="endTime!=null">
+                and t.`create_time` &lt;= #{endTime}
+            </if>
+            and t.deleted = 0
+        </where>
+    </select>
+
+    <sql id="selectUserVo">
+        select u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.avatar, u.phonenumber, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
+               d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.status as dept_status,
+               r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope, r.status as role_status
+        from sys_user u
+                 left join sys_dept d on u.dept_id = d.dept_id
+                 left join sys_user_role ur on u.user_id = ur.user_id
+                 left join sys_role r on r.role_id = ur.role_id
+    </sql>
+
+
+    <select id="selectTenantUserById" resultType="com.baseline.system.entity.SysUser">
+        select u.* from sys_user u
+        inner join sys_tenant_user tu on u.id = tu.user_id
+        where u.id = #{userId} 
+          and u.status = 1
+          and tu.status = 1
+          and u.deleted = 0
+    </select>
+
+    <select id="selectUserForLogin" parameterType="String" resultType="com.baseline.system.entity.SysUser">
+        select * from sys_user 
+        where account = #{username} and deleted = 0
+    </select>
+</mapper>

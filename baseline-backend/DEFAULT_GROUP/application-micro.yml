@@ -1,0 +1,181 @@
+logging:
+  level:
+    com.gzhaochuan: WARN
+
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 30MB #单个上传文件大小
+      max-request-size: 30MB #最大上传文件大小
+  mvc:
+    pathmatch: 
+      matching-strategy: ant_path_matcher
+  data:
+    redis:
+      #cachePrefix: "" #项目redis缓存前缀
+      host: 192.168.6.198
+      port: 30379
+      password: GZhc@1230
+      database: 10
+      # redis连接超时时间（单位为毫秒）
+      timeout: 7200
+      maxclients: 30000
+      tcp-keepalive: 20
+      tcp-backlog: 500
+      # redis连接池配置
+      lettuce:
+        refresh:
+          adaptive: true
+          #20秒自动刷新一次
+          period: 20
+        pool:
+          # 最大可用连接数（默认为8，负数表示无限）
+          max-active: 30
+          # 最大空闲连接数（默认为8，负数表示无限）
+          max-idle: 30
+          # 最小空闲连接数（默认为0，该值只有为正数才有作用）
+          min-idle: 10
+          # 从连接池中获取连接最大等待时间（默认为-1，单位为毫秒，负数表示无限）
+          max-wait: 20000
+
+  datasource:
+    dynamic:
+      primary: master #设置默认数据库源
+      strict: true #严格匹配数据源，默认为false，true未匹配到指定数据库时抛异常，false使用默认数据源
+      datasource:
+        master:
+          url: jdbc:mysql://${DB_HOST:192.168.2.42}:${MYSQL_PORT:3306}/${DB_NAME:easyjax_baseline}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:123456}
+          driver-class-name: com.mysql.cj.jdbc.Driver
+
+############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
+sa-token: 
+  # token 名称（同时也是 cookie 名称）
+  token-name: Authorization
+  # token 有效期（单位：秒） 默认30天，-1 代表永久有效
+  timeout: 2592000
+  # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认-1 代表不限制，永不冻结
+  active-timeout: -1
+  # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个 token （为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token）
+  is-share: false
+  # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
+  token-style: uuid
+  # 是否输出操作日志 
+  is-log: true
+  # token前缀
+  token-prefix: Bearer
+  # 是否读取cookie
+  is-read-cookie: false
+  # SSO-Server 配置
+  sso-server:
+      # Ticket有效期 (单位: 秒)，默认五分钟 
+      ticket-timeout: 300
+
+# mybatis-plus:
+#   global-config:
+#     db-config:
+#       logic-delete-field: deleted
+#       logic-not-delete-value: 0
+#       logic-delete-value: 1
+#   configuration:
+#         log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-not-delete-value: 0
+      logic-delete-value: 1
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+tenant:
+  # 是否开启租户模式
+  enable: true
+  # 层级租户
+  hierarchy: 
+    enable: true
+  # 需要排除的多租户的表
+  exclusionTable:
+    - "sys_user"
+    - "sys_user_third_party_bind"
+    - "sys_user_real_name_auth"
+    - "sys_member_real_name_auth"
+    - "sys_member_third_party_bind"
+    - "sys_config_group"
+    - "sys_config"
+    - "sys_dict_data"
+    - "sys_dict_type"
+    - "sys_menu"
+    - "sys_permission"
+    - "sys_project"
+    - "sys_tenant"
+    - "sys_menu"
+    - "sys_logininfor"
+    - "sys_user_role"
+
+  # 租户字段名称
+  column: tenant_id
+
+security:
+  xss: 
+    enabled: true
+  captcha: 
+    enabled: false
+    type: math
+  ignore:
+    whites:
+      - /favicon.ico
+      # swagger / knife4j 文档
+      - /doc.html
+      - /*/doc.html
+      - /webjars/**
+      - /*/webjars/**
+      - /swagger-resources
+      - /swagger-resources/**
+      - /*/swagger-resources
+      - /*/swagger-resources/**
+      - /swagger-ui/**
+      - /*/swagger-ui/**
+      - /*/v2/api-docs
+      - /*/v2/api-docs/**
+      - /*/v3/api-docs
+      - /*/v3/api-docs/**
+      # 验证码
+      - /auth/captcha/image
+      - /auth/captcha/isEnabled
+      # 认证服务
+      - /auth/user/login
+      - /auth/user/logout
+      - /auth/user/userinfo
+      - /auth/oauth/**
+      # 系统服务
+      - /system/adminApi/file/domain
+      - /system/adminApi/sysConfig/all
+      - /system/adminApi/tenant/simpleList
+      - /system/adminApi/dict/groups
+      - /system/adminApi/user/tenant/**
+
+knife4j:
+  # 启用增强
+  enable: true
+  # 启用拦截过滤
+  production: false
+
+  
+oss:
+  type: minio
+  enabled: true
+  access-endpoint: https://192.168.2.42:9001
+  root-upload-path: /data/data/upload
+  temp-path: /data/tmp
+  bucket-name: easyjax_baseline
+  access-key: admin
+  secret-key: 123456
+  endpoint: http://192.168.2.42:9000
+  allowPreview:
+    - image/png
+    - image/jpeg
+    - image/jpg

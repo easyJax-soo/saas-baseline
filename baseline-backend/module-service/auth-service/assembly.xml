@@ -1,0 +1,29 @@
+<assembly>
+    <id>hc-assembly1</id>
+
+    <formats>
+        <format>dir</format>
+    </formats>
+
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <fileSets>
+        <!-- 认证服务（auth-service）可执行 JAR 文件 -->
+        <fileSet>
+            <directory>${project.basedir}/target</directory>
+            <outputDirectory>auth-service</outputDirectory>
+            <includes>
+                <include>auth-service.jar</include>
+            </includes>
+        </fileSet>
+        <!-- 认证服务（auth-service） 配置文件 -->
+        <fileSet>
+            <directory>${project.basedir}/src/main/resources</directory>
+            <outputDirectory>auth-service</outputDirectory>
+            <includes>
+                <include>*.yml</include>
+            </includes>
+        </fileSet>
+
+    </fileSets>
+</assembly>

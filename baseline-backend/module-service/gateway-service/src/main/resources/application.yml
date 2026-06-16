@@ -1,0 +1,41 @@
+server:
+  port: ${SERVER_PORT:38080}
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            corsConfigurations:
+              '[/**]':
+                allowedOrigins: "*"
+                allowedMethods: "*"
+                allowedHeaders: "*"
+                allowCredentials: false
+                maxAge: 3600
+
+          httpclient:
+            connect-timeout: 50000
+            response-timout: 100s
+
+          routes:
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/auth/**
+              filters:
+                - CacheRequestFilter
+                - StripPrefix=1
+              metadata:
+                serviceName: 认证中心
+
+            - id: system-service
+              uri: lb://system-service
+              predicates:
+                - Path=/system/**
+              filters:
+                - StripPrefix=1
+              metadata:
+                serviceName: 系统服务

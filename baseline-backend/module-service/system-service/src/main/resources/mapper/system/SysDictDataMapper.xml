@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysDictDataMapper">
+
+    <select id="getDictDataByDictCode" resultType="com.baseline.common.vo.DictBizVO">
+        select id, label, value, remark, status
+        from sys_dict_data
+        where code = #{dto.code}
+        and deleted = 0
+    </select>
+</mapper>

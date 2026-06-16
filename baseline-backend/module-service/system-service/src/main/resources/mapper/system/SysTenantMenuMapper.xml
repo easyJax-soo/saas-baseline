@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysTenantMenuMapper">
+
+
+    <!-- 多租户拦截器会自动在sys_tenant_menu表上添加tenant_id条件 -->
+    <select id="selectTenantMenu" resultType="com.baseline.system.vo.SysTenantMenuVO">
+        select m.*, tm.`id` as tenant_menu_id
+        from sys_menu as m
+        inner join sys_tenant_menu as tm on tm.menu_id = m.id
+        where m.status = 1
+        order by m.sort_no
+    </select>
+
+    <!-- 查询指定租户的菜单（用于系统管理员查询其他租户资源） -->
+    <select id="selectTenantMenuByTenantId" resultType="com.baseline.system.vo.SysTenantMenuVO">
+        select m.*, tm.`id` as tenant_menu_id
+        from sys_menu as m
+        inner join sys_tenant_menu as tm on tm.menu_id = m.id
+        where m.status = 1 and tm.tenant_id = #{tenantId}
+        order by m.sort_no
+    </select>
+
+    <select id="selectTenantMemberNodeList" resultType="com.baseline.system.vo.SysTenantMenuVO">
+        select m.*, tm.`id` as tenant_menu_id
+        from sys_menu as m
+        left join sys_tenant_user_menu as tum on tum.menu_id = m.id
+        left join sys_tenant_menu as tm on tm.menu_id = m.id
+        <where>
+            m.status = 1
+            <if test="tenantId!=null">
+                and tum.tenant_id=#{tenantId}
+            </if>
+            <if test="tenantMemberId!=null">
+               and tum.tenant_member_id=#{tenantMemberId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getOneTenantMenu" resultType="com.baseline.system.vo.SysTenantMenuVO">
+        select  m.*, tm.`id` as tenant_menu_id
+        from sys_tenant_menu as tm
+        left join sys_menu as m on tm.menu_id = m.id
+        <where>
+            <if test="menuId!=null">
+                and m.id=#{menuId}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+
+</mapper>

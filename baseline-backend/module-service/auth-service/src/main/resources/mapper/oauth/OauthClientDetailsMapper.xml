@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.auth.mapper.OauthClientDetailsMapper">
+
+    <!-- 公共字段抽取 -->
+    <sql id="OauthClientDetailsFields">
+        t.id, t.name, t.client_id, t.client_secret,
+        t.resource_ids, t.scope, t.authorized_grant_types,
+        t.web_server_redirect_uri, t.authorities, t.access_token_validity,
+        t.refresh_token_validity, t.additional_information,
+        t.create_time, t.update_time, t.autoapprove
+    </sql>
+
+    <!-- 公共的resultMap -->
+    <resultMap id="OauthClientDetailsMap" type="com.baseline.auth.vo.OauthClientDetailsVO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="client_id" property="clientId"/>
+        <result column="client_secret" property="clientSecret"/>
+        <result column="resource_ids" property="resourceIds" typeHandler="com.baseline.auth.handler.CommaSeparatedStringToArrayHandler"/>
+        <result column="scope" property="scope"/>
+        <result column="authorized_grant_types" property="authorizedGrantTypes"
+                typeHandler="com.baseline.auth.handler.CommaSeparatedStringToArrayHandler"/>
+        <result column="web_server_redirect_uri" property="webServerRedirectUri"/>
+        <result column="authorities" property="authorities"/>
+        <result column="access_token_validity" property="accessTokenValidity"/>
+        <result column="refresh_token_validity" property="refreshTokenValidity"/>
+        <result column="additional_information" property="additionalInformation" typeHandler="com.baseline.auth.handler.JsonObjectTypeHandler"/>
+        <result column="autoapprove" property="autoapprove"/>
+    </resultMap>
+
+    <!-- 分页查询 -->
+    <select id="paging" resultMap="OauthClientDetailsMap">
+        SELECT
+        <include refid="OauthClientDetailsFields"/>
+        FROM oauth_client_details as t
+        <where>
+            <if test="dto.name!=null and dto.name!=''">
+                AND  t.name LIKE  concat("%",#{dto.name},"%")
+            </if>
+        </where>
+        group by  t.id
+    </select>
+
+    <!-- 列表查询 -->
+    <select id="simpleList" resultMap="OauthClientDetailsMap">
+        SELECT
+        <include refid="OauthClientDetailsFields"/>
+        FROM oauth_client_details as t
+        <where>
+            <if test="dto.name!=null and dto.name!=''">
+                AND  t.name LIKE  concat("%",#{dto.name},"%")
+            </if>
+        </where>
+        group by  t.id
+    </select>
+
+    <!-- 详情查询 -->
+    <select id="getDetail" resultMap="OauthClientDetailsMap">
+        SELECT
+        <include refid="OauthClientDetailsFields"/>
+        FROM oauth_client_details as t
+        <where>
+            `t`.`id`= #{id}
+        </where>
+        limit 1
+    </select>
+
+
+    <!-- 详情查询 -->
+    <select id="getDetailByClientId" resultMap="OauthClientDetailsMap">
+        SELECT
+        <include refid="OauthClientDetailsFields"/>
+        FROM oauth_client_details as t
+        <where>
+            `t`.`client_id`= #{clientId}
+        </where>
+        limit 1
+    </select>
+
+    <!-- saveOrUpdate -->
+    <insert id="saveOrUpdate" parameterType="com.baseline.auth.vo.OauthClientDetailsVO">
+        <choose>
+            <!-- 如果id存在则执行更新 -->
+            <when test="id != null">
+                UPDATE oauth_client_details
+                SET name = #{name},
+                client_id = #{clientId},
+                client_secret = #{clientSecret},
+                resource_ids = #{resourceIds, typeHandler=com.baseline.auth.handler.CommaSeparatedStringToArrayHandler},
+                scope = #{scope},
+                authorized_grant_types = #{authorizedGrantTypes, typeHandler=com.baseline.auth.handler.CommaSeparatedStringToArrayHandler},
+                web_server_redirect_uri = #{webServerRedirectUri},
+                authorities = #{authorities},
+                access_token_validity = #{accessTokenValidity},
+                refresh_token_validity = #{refreshTokenValidity},
+                additional_information = #{additionalInformation, typeHandler=com.baseline.auth.handler.JsonObjectTypeHandler},
+                autoapprove = #{autoapprove},
+                update_time = now()
+                WHERE id = #{id}
+            </when>
+            <!-- 如果id不存在则执行插入 -->
+            <otherwise>
+                INSERT INTO oauth_client_details (
+                name, client_id, client_secret, resource_ids, scope,
+                authorized_grant_types, web_server_redirect_uri, authorities,
+                access_token_validity, refresh_token_validity,
+                additional_information, autoapprove, create_time, update_time
+                ) VALUES (
+                #{name}, #{clientId}, #{clientSecret}, #{resourceIds, typeHandler=com.baseline.auth.handler.CommaSeparatedStringToArrayHandler}, #{scope},
+                #{authorizedGrantTypes, typeHandler=com.baseline.auth.handler.CommaSeparatedStringToArrayHandler},
+                #{webServerRedirectUri}, #{authorities}, #{accessTokenValidity},
+                #{refreshTokenValidity}, #{additionalInformation, typeHandler=com.baseline.auth.handler.JsonObjectTypeHandler}, #{autoapprove}, now(), now()
+                )
+            </otherwise>
+        </choose>
+    </insert>
+</mapper>

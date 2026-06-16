@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysMemberThirdPartyBindMapper">
+
+    <select id="selectByProviderAndThirdPartyUserId" resultType="com.baseline.system.entity.SysMemberThirdPartyBind">
+        select id, provider, provider_name, third_party_user_id, member_id, bind_time
+        from sys_member_third_party_bind
+        where provider = #{provider} and third_party_user_id = #{thirdPartyUserId}
+        limit 1
+    </select>
+
+    <select id="selectByMemberId" resultType="com.baseline.system.entity.SysMemberThirdPartyBind">
+        select id, provider, provider_name, third_party_user_id, member_id, bind_time
+        from sys_member_third_party_bind
+        where member_id = #{memberId}
+        order by bind_time desc
+    </select>
+
+</mapper>

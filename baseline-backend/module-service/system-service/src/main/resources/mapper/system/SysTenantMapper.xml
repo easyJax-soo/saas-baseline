@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysTenantMapper">
+
+
+    <select id="pageTenant" resultType="com.baseline.system.vo.SysTenantVO">
+        select `id`, `name`, `code`, `status`, `create_time`, `update_time`, `remark`
+        from sys_tenant
+        <where>
+            <if test="dto.name!='' and dto.name!=null">
+                name like concat("%",#{dto.name},"%")
+            </if>
+            <if test="dto.status!=null">
+                and status=#{dto.status}
+            </if>
+            and deleted=0
+        </where>
+        order by create_time desc
+    </select>
+
+
+</mapper>

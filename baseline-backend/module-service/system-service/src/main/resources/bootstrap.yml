@@ -1,0 +1,44 @@
+# Spring
+spring:
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+  application:
+    # 应用名称
+    name: system-service
+  profiles:
+    # 环境配置
+    active: ${SPRING_ACTIVE:micro}
+
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    nacos:
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:nacos}
+      discovery:
+        # 服务注册地址
+        server-addr: ${NACOS_HOST:192.168.2.42}:${NACOS_PORT:30848}
+        namespace: ${NACOS_NAMESPACE:a5318def-6881-4de0-991d-d8ab55731f30}
+        group: ${NACOS_GROUP:DEFAULT_GROUP}
+      config:
+        # 配置中心地址
+        server-addr: ${NACOS_HOST:192.168.2.42}:${NACOS_PORT:30848}
+        namespace: ${NACOS_NAMESPACE:a5318def-6881-4de0-991d-d8ab55731f30}
+        group: ${NACOS_GROUP:DEFAULT_GROUP}
+        # 配置文件格式
+        file-extension: yml
+        # 共享配置
+        shared-configs:
+          - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+  config:
+    import:
+      - optional:nacos:application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}?refresh=true
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}?refresh=true
+
+logging:
+  config: classpath:logback.xml
+
+# swagger配置
+swagger:
+  title: 系统服务

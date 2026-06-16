@@ -1,0 +1,2 @@
+com.baseline.mybatis.config.MybatisPlusConfig
+com.baseline.mybatis.service.SysDataScopeService

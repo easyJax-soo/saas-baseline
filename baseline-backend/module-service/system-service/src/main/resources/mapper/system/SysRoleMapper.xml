@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysRoleMapper">
+
+    <update id="updateRole">
+        update sys_role
+        <set>
+            <if test="sysRole.name!='' and sysRole.name!=null">
+                name=#{sysRole.name},
+            </if>
+            <if test="sysRole.key!='' and sysRole.key!=null">
+                `key`=#{sysRole.key},
+            </if>
+            <if test="sysRole.dataScope!=null">
+                data_scope=#{sysRole.dataScope},
+            </if>
+            <if test="sysRole.status!=null">
+                status=#{sysRole.status},
+            </if>
+            <if test="sysRole.remark!=null">
+                remark=#{sysRole.remark}
+            </if>
+            <if test="sysRole.remark==null">
+                remark=null
+            </if>
+        </set>
+        where id=#{sysRole.id}
+    </update>
+
+    <select id="getSimpleList" resultType="com.baseline.system.vo.SimpleRoleVO">
+        select id, `key`, name from sys_role
+        <where>
+            and tenant_id = #{tenantId}
+            and deleted=0
+        </where>
+
+    </select>
+    <select id="getSimpleListByUserId" resultType="com.baseline.system.vo.SimpleRoleVO">
+        select sr.id, sr.`key`, sr.name
+        from sys_role sr
+                 left join sys_user_role sur on sur.role_id = sr.id
+        where sur.user_id=#{userId}
+    </select>
+    <select id="page" resultType="com.baseline.system.vo.SysRolePageVO">
+        select `id`, `name`, `key`, `status`, `data_scope`, `create_time`
+        from sys_role
+        <where>
+            <if test="dto.name!=null and dto.name!=''">
+                `name` like concat('%',#{dto.name},'%')
+            </if>
+            <if test="dto.key!=null and dto.key!=''">
+                `key` like concat('%',#{dto.key},'%')
+            </if>
+            <if test="dto.status!=null">
+                and `status` = #{dto.status}
+            </if>
+            <if test="dto.dataScope!=null">
+                and `data_scope` = #{dto.dataScope}
+            </if>
+            and `deleted`=0
+        </where>
+        order by `create_time` desc
+    </select>
+
+    <select id="selectUserRoleByUserId" parameterType="Long" resultType="com.baseline.system.entity.SysRole">
+        select distinct r.id, r.name, r.key, r.status, r.deleted, r.create_time, r.update_time, r.remark
+        from sys_role r
+                 left join sys_user_role ur on ur.role_id = r.id
+                 left join sys_user u on u.id = ur.user_id
+        WHERE r.deleted = 0 and ur.user_id = #{userId}
+    </select>
+</mapper>

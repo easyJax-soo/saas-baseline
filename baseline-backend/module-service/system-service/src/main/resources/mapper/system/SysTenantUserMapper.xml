@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysTenantUserMapper">
+
+
+    <select id="pageTenantUser" resultType="com.baseline.system.vo.SysTenantUserDetailVO">
+        select tu.id, tu.is_tenant_admin, tu.tenant_id, u.id as user_id, u.account, u.name, u.email, u.phone
+        from sys_tenant_user as tu
+        left join sys_user as u on tu.user_id = u.id
+        <where>
+            <if test="dto.tenantId!=null">
+                and tu.tenant_id=#{dto.tenantId}
+            </if>
+            <if test="dto.isTenantAdmin!=null">
+                and tu.is_tenant_admin=#{dto.isTenantAdmin}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getDetailById" resultType="com.baseline.system.vo.SysTenantUserDetailVO">
+        select tu.id, tu.is_tenant_admin, tu.tenant_id, u.id as user_id, u.account, u.name, u.email, u.phone
+        from sys_tenant_user as tu
+        left join sys_user as u on tu.user_id = u.id
+        where tu.id=#{id}
+        limit 1
+    </select>
+
+
+    <select id="getUserTenantList" resultType="com.baseline.system.vo.UserTenantVO">
+        select 
+            t.id as tenantId,
+            t.name as tenantName,
+            t.code as tenantCode,
+            t.status as tenantStatus,
+            tu.is_tenant_admin as isTenantAdmin
+        from sys_tenant_user as tu
+        left join sys_tenant as t on tu.tenant_id = t.id
+        where tu.user_id = #{userId}
+          and tu.status = 1
+          and t.deleted = 0
+        order by tu.create_time desc
+    </select>
+
+    <select id="getUnboundUsers" resultType="com.baseline.system.vo.SysTenantUnboundUserVO">
+        select 
+            u.id,
+            u.account,
+            u.name,
+            u.phone,
+            u.email,
+            u.dept_id as deptId,
+            d.name as deptName,
+            u.status,
+            u.create_time as createTime
+        from sys_user u
+        left join sys_dept d on u.dept_id = d.id
+        where u.deleted = 0
+          and u.id not in (
+              select tu.user_id 
+              from sys_tenant_user tu 
+              where tu.tenant_id = #{dto.tenantId} 
+                and tu.status = 1
+          )
+        <if test="dto.account != null and dto.account != ''">
+            and u.account like concat('%', #{dto.account}, '%')
+        </if>
+        <if test="dto.name != null and dto.name != ''">
+            and u.name like concat('%', #{dto.name}, '%')
+        </if>
+        <if test="dto.deptId != null">
+            and u.dept_id = #{dto.deptId}
+        </if>
+        order by u.create_time desc
+    </select>
+
+    <!-- 获取租户关联的用户列表（用于下拉选项） -->
+    <!-- 多租户拦截器会自动在sys_tenant_user表上添加tenant_id条件 -->
+    <select id="selectTenantUsers" resultType="com.baseline.system.entity.SysUser">
+        select u.*
+        from sys_user u
+        inner join sys_tenant_user tu on u.id = tu.user_id
+        where u.status = 1 
+          and u.deleted = 0
+          and tu.status = 1
+        order by u.id
+    </select>
+
+</mapper>

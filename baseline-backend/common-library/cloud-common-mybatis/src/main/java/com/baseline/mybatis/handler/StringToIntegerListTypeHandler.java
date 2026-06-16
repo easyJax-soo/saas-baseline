@@ -1,0 +1,55 @@
+package com.baseline.mybatis.handler;
+
+import org.apache.ibatis.type.BaseTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedJdbcTypes;
+import org.apache.ibatis.type.MappedTypes;
+
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+/**
+ *
+ *
+ * @TableField(typeHandler = StringToIntegerListTypeHandler.class)
+ */
+@MappedJdbcTypes(JdbcType.VARCHAR)
+@MappedTypes(List.class)
+public class StringToIntegerListTypeHandler extends BaseTypeHandler<List<Long>> {
+
+    public StringToIntegerListTypeHandler(){
+
+    }
+
+    @Override
+    public void setNonNullParameter(PreparedStatement preparedStatement, int i, List<Long> integers, JdbcType jdbcType) throws SQLException {
+        preparedStatement.setString(i, integers.stream().map(Object::toString).collect(Collectors.joining(",")));
+    }
+
+
+    @Override
+    public List<Long> getNullableResult(ResultSet resultSet, String s) throws SQLException {
+        String ids = resultSet.getString(s);
+        return ids == null || ids.equals("") ? null :
+                Stream.of(ids.split(",")).map(Long::valueOf).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Long> getNullableResult(ResultSet resultSet, int i) throws SQLException {
+        String ids = resultSet.getString(i);
+        return ids == null || ids.equals("") ? null :
+                Stream.of(ids.split(",")).map(Long::valueOf).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Long> getNullableResult(CallableStatement callableStatement, int i) throws SQLException {
+        String ids = callableStatement.getString(i);
+        return ids == null || ids.equals("") ? null :
+                Stream.of(ids.split(",")).map(Long::valueOf).collect(Collectors.toList());
+    }
+}

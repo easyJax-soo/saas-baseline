@@ -1,0 +1,2 @@
+com.baseline.log.service.AsyncLogService
+com.baseline.log.aspect.LogAspect

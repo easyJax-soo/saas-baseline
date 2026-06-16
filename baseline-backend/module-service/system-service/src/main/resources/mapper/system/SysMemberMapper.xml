@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysMemberMapper">
+
+    <select id="pageMember" resultType="com.baseline.system.vo.PageSysMemberVO">
+        select `m`.`id`,`m`.`account`, `m`.`name`, `m`.`phone`, `m`.`email`, `m`.`status`, `m`.`create_time`, 
+               `m`.`sex`, `m`.`avatar`
+        from sys_member as m
+        <where>
+            <if test="dto.name!='' and dto.name!=null">
+                `m`.`name` like concat("%",#{dto.name},"%")
+            </if>
+            <if test="dto.account!='' and dto.account!=null">
+                and `m`.`account` like concat("%",#{dto.account},"%")
+            </if>
+            <if test="dto.phone!='' and dto.phone!=null">
+                and `m`.`phone` like concat("%",#{dto.phone},"%")
+            </if>
+            <if test="dto.email!='' and dto.email!=null">
+                and `m`.`email` like concat("%",#{dto.email},"%")
+            </if>
+            <if test="dto.status!=null">
+                and `m`.`status`=#{dto.status}
+            </if>
+            <if test="dto.sex!=null">
+                and `m`.`sex`=#{dto.sex}
+            </if>
+            <if test="dto.beginTime!=null">
+                and `m`.`create_time` &gt;= #{dto.beginTime}
+            </if>
+            <if test="dto.endTime!=null">
+                and `m`.`create_time` &lt;= #{dto.endTime}
+            </if>
+            and `m`.`deleted`=0
+        </where>
+        order by `m`.`create_time` desc
+    </select>
+
+    <select id="getTenantIdByMemberId" resultType="java.lang.String">
+        select tenant_id from sys_member where id = #{memberId} and deleted = 0
+    </select>
+
+    <select id="selectMemberForLogin" resultType="com.baseline.system.entity.SysMember">
+        select id, tenant_id, account, password, salt, name, email, phone, sex, avatar, status, deleted, remark, 
+               create_time, create_user_id, create_user, update_time, update_user_id, update_user
+        from sys_member 
+        where account = #{account} and deleted = 0
+    </select>
+
+</mapper>

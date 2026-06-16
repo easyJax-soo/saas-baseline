@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysTenantProjectMapper">
+
+    <!-- 获取租户关联的项目列表（用于下拉选项） -->
+    <!-- 多租户拦截器会自动在sys_tenant_project表上添加tenant_id条件 -->
+    <select id="selectTenantProjects" resultType="com.baseline.system.entity.SysProject">
+        select p.*
+        from sys_project p
+        inner join sys_tenant_project tp on p.code = tp.project_code
+        where p.status = 1 
+          and p.deleted = 0
+        order by p.sort_no
+    </select>
+
+</mapper>

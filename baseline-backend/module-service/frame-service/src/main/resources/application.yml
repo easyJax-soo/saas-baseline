@@ -1,0 +1,63 @@
+server:
+  port: 38080
+
+spring:
+  application:
+    name: frame-service
+  datasource:
+    dynamic:
+      primary: master
+      datasource:
+        master:
+          url: jdbc:mysql://localhost:3306/baseline_system?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+          username: root
+          password: root
+          driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    password: ''
+    timeout: 5000ms
+    lettuce:
+      pool:
+        max-active: 200
+        max-idle: 50
+        min-idle: 10
+        max-wait: 10000ms
+
+sa-token:
+  token-name: Authorization
+  timeout: 2592000
+  active-timeout: 1800
+  is-concurrent: true
+  is-share: false
+  token-style: uuid
+  token-prefix: Bearer
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.baseline.**.domain
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+tenant:
+  enable: true
+  column: tenant_id
+  exclusionTable:
+    - sys_user
+    - sys_menu
+    - sys_config
+    - sys_dict_data
+    - sys_dict_type
+    - sys_tenant
+    - oauth_client_details
+
+spring.redis:
+  cache-prefix:
+    default: "BASELINE:"
+
+logging:
+  level:
+    com.baseline: debug

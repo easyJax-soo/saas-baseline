@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysMenuMapper">
+
+
+    <select id="getMyNodeList" resultType="com.baseline.system.entity.SysMenu">
+        select distinct sm.* from sys_role_menu srm
+                             left join sys_menu sm on srm.menu_id = sm.id
+                             left join sys_user_role sur on srm.role_id = sur.role_id
+        where sur.user_id=#{userId} and sm.deleted=0 and sm.status=1
+        <if test="type!=null">
+            AND sm.type=#{type}
+        </if>
+        order by sm.sort_no
+    </select>
+
+    <!-- 根据用户ID和项目编码获取菜单列表 -->
+    <select id="getMyNodeListByProject" resultType="com.baseline.system.entity.SysMenu">
+        select distinct sm.* from sys_role_menu srm
+                             left join sys_menu sm on srm.menu_id = sm.id
+                             left join sys_user_role sur on srm.role_id = sur.role_id
+        where sur.user_id=#{userId} and sm.deleted=0 and sm.status=1
+          and sm.project_code=#{projectCode}
+        <if test="type!=null">
+            AND sm.type=#{type}
+        </if>
+        order by sm.sort_no
+    </select>
+
+    <select id="selectMenuPermsByUserId" parameterType="Long" resultType="String">
+        select distinct m.key
+        from sys_menu m
+                 left join sys_role_menu rm on m.id = rm.menu_id
+                 left join sys_user_role ur on rm.role_id = ur.role_id
+                 left join sys_role r on r.id = ur.role_id
+        where m.status = '1' and r.status = '1' and ur.user_id = #{userId}
+    </select>
+
+
+    <!-- 获取租户授权的菜单列表 -->
+    <!-- 注意：多租户拦截器会自动在sys_tenant_menu表上拼接tenant_id条件 -->
+    <!-- 在层级租户模式下使用DISTINCT去重，避免父子租户菜单重复 -->
+    <select id="getTenantMenuList" resultType="com.baseline.system.entity.SysMenu">
+        select distinct sm.* 
+        from sys_menu sm
+        inner join sys_tenant_menu stm on sm.id = stm.menu_id
+        where sm.deleted = 0 
+          and sm.status = 1 
+        order by sm.sort_no
+    </select>
+
+
+    <!-- 从sys_role_menu表获取租户用户的角色权限菜单 -->
+    <select id="getMyTenantRoleNodeList" resultType="com.baseline.system.entity.SysMenu">
+        select distinct sm.* 
+        from sys_role_menu srm
+        left join sys_menu sm on srm.menu_id = sm.id
+        left join sys_user_role sur on srm.role_id = sur.role_id
+        inner join sys_tenant_menu stm on sm.id = stm.menu_id
+        where sur.user_id = #{userId} 
+          and sm.deleted = 0 
+          and sm.status = 1
+          and srm.tenant_id = #{tenantId}
+          and stm.tenant_id = #{tenantId}
+        <if test="type != null">
+            and sm.type = #{type}
+        </if>
+        order by sm.sort_no
+    </select>
+
+    <!-- 从sys_role_menu表获取租户用户的角色权限菜单（按项目过滤） -->
+    <select id="getMyTenantRoleNodeListByProject" resultType="com.baseline.system.entity.SysMenu">
+        select distinct sm.* 
+        from sys_role_menu srm
+        left join sys_menu sm on srm.menu_id = sm.id
+        left join sys_user_role sur on srm.role_id = sur.role_id
+        inner join sys_tenant_menu stm on sm.id = stm.menu_id
+        where sur.user_id = #{userId} 
+          and sm.deleted = 0 
+          and sm.status = 1
+          and sm.project_code = #{projectCode}
+          and srm.tenant_id = #{tenantId}
+          and stm.tenant_id = #{tenantId}
+        <if test="type != null">
+            and sm.type = #{type}
+        </if>
+        order by sm.sort_no
+    </select>
+
+</mapper>

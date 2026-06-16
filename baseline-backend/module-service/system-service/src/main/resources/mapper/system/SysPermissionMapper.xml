@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baseline.system.mapper.SysPermissionMapper">
+
+
+
+    <select id="selectPermsByUserId" parameterType="Long" resultType="com.baseline.system.entity.SysPermission">
+        select p.*
+        from sys_permission p
+        LEFT JOIN sys_role_permission rp ON p.id = rp.permission_id
+        LEFT JOIN sys_user_role sur on rp.role_id = sur.role_id
+        where sur.user_id=#{userId} and p.deleted=0
+    </select>
+
+    <select id="getPermissionsByUserIdAndRoleId" resultType="com.baseline.common.vo.UserPermissionBizVO">
+        select p.*
+        from sys_permission p
+                 LEFT JOIN sys_role_permission rp ON p.id = rp.permission_id
+                 LEFT JOIN sys_user_role sur on rp.role_id = sur.role_id
+        where sur.user_id=#{dto.userId} and sur.role_id=#{dto.roleId} and p.deleted=0
+    </select>
+
+    <!-- 通过用户ID和多个角色ID获取权限列表 -->
+    <select id="getPermissionsByUserIdAndRoleIds" resultType="com.baseline.common.vo.UserPermissionBizVO">
+        select distinct p.*
+        from sys_permission p
+                 LEFT JOIN sys_role_permission rp ON p.id = rp.permission_id
+                 LEFT JOIN sys_user_role sur on rp.role_id = sur.role_id
+        where sur.user_id=#{dto.userId} 
+          and sur.role_id in 
+          <foreach collection="dto.roleIds" item="roleId" open="(" separator="," close=")">
+              #{roleId}
+          </foreach>
+          and p.deleted=0
+    </select>
+
+    <!-- 获取租户管理员权限 -->
+    <select id="getTenantAdminPermissions" resultType="com.baseline.common.vo.UserPermissionBizVO">
+        select p.*
+        from sys_permission p
+        inner join sys_tenant_permission tp on p.id = tp.permission_id
+        where p.deleted = 0
+    </select>
+
+</mapper>

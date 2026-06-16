@@ -1,0 +1,29 @@
+<assembly>
+    <id>hc-assembly1</id>
+
+    <formats>
+        <format>dir</format>
+    </formats>
+
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <fileSets>
+        <!-- 网关服务（gateway-service）可执行 JAR 文件 -->
+        <fileSet>
+            <directory>${project.basedir}/target</directory>
+            <outputDirectory>gateway-service</outputDirectory>
+            <includes>
+                <include>gateway-service.jar</include>
+            </includes>
+        </fileSet>
+        <!-- 网关服务（gateway-service） 配置文件 -->
+        <fileSet>
+            <directory>${project.basedir}/src/main/resources</directory>
+            <outputDirectory>gateway-service</outputDirectory>
+            <includes>
+                <include>*.yml</include>
+            </includes>
+        </fileSet>
+
+    </fileSets>
+</assembly>

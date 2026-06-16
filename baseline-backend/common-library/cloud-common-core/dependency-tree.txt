@@ -1,0 +1,88 @@
+com.baseline.library:cloud-common-core:jar:3.0.0-SNAPSHOT
++- org.springframework.boot:spring-boot-starter:jar:2.7.13:compile
+|  +- org.springframework.boot:spring-boot:jar:2.7.13:compile
+|  |  \- org.springframework:spring-context:jar:5.3.28:compile
+|  |     +- org.springframework:spring-aop:jar:5.3.28:compile
+|  |     \- org.springframework:spring-expression:jar:5.3.28:compile
+|  +- org.springframework.boot:spring-boot-autoconfigure:jar:2.7.13:compile
+|  +- org.springframework.boot:spring-boot-starter-logging:jar:2.7.13:compile
+|  |  +- org.apache.logging.log4j:log4j-to-slf4j:jar:2.17.2:compile
+|  |  |  \- org.apache.logging.log4j:log4j-api:jar:2.17.2:compile
+|  |  \- org.slf4j:jul-to-slf4j:jar:1.7.36:compile
+|  +- jakarta.annotation:jakarta.annotation-api:jar:1.3.5:compile
+|  +- org.springframework:spring-core:jar:5.3.28:compile
+|  |  \- org.springframework:spring-jcl:jar:5.3.28:compile
+|  \- org.yaml:snakeyaml:jar:1.30:compile
++- org.springframework:spring-web:jar:5.3.28:compile
+|  \- org.springframework:spring-beans:jar:5.3.28:compile
++- org.projectlombok:lombok:jar:1.18.28:compile
++- ch.qos.logback:logback-classic:jar:1.2.12:compile
+|  +- ch.qos.logback:logback-core:jar:1.2.12:compile
+|  \- org.slf4j:slf4j-api:jar:1.7.36:compile
++- org.apache.commons:commons-lang3:jar:3.12.0:compile
++- com.baseline.library:cloud-common-jackson:jar:3.0.0-SNAPSHOT:compile
+|  +- com.fasterxml.jackson.core:jackson-databind:jar:2.13.5:compile
+|  |  +- com.fasterxml.jackson.core:jackson-annotations:jar:2.13.5:compile
+|  |  \- com.fasterxml.jackson.core:jackson-core:jar:2.13.5:compile
+|  \- com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.13.5:compile
++- com.baseline.library:cloud-common-common-biz:jar:3.0.0-SNAPSHOT:compile
+|  +- org.springframework.boot:spring-boot-starter-web:jar:2.7.13:compile
+|  |  +- org.springframework.boot:spring-boot-starter-json:jar:2.7.13:compile
+|  |  |  +- com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar:2.13.5:compile
+|  |  |  \- com.fasterxml.jackson.module:jackson-module-parameter-names:jar:2.13.5:compile
+|  |  +- org.springframework.boot:spring-boot-starter-tomcat:jar:2.7.13:compile
+|  |  |  +- org.apache.tomcat.embed:tomcat-embed-core:jar:9.0.76:compile
+|  |  |  \- org.apache.tomcat.embed:tomcat-embed-websocket:jar:9.0.76:compile
+|  |  \- org.springframework:spring-webmvc:jar:5.3.28:compile
+|  +- com.baseline.library:cloud-common-swagger:jar:3.0.0-SNAPSHOT:compile
+|  |  +- com.github.xiaoymin:knife4j-spring-boot-starter:jar:3.0.3:compile
+|  |  |  +- com.github.xiaoymin:knife4j-spring-boot-autoconfigure:jar:3.0.3:compile
+|  |  |  |  +- com.github.xiaoymin:knife4j-spring:jar:3.0.3:compile
+|  |  |  |  |  +- com.github.xiaoymin:knife4j-annotations:jar:3.0.3:compile
+|  |  |  |  |  +- com.github.xiaoymin:knife4j-core:jar:3.0.3:compile
+|  |  |  |  |  |  +- org.javassist:javassist:jar:3.25.0-GA:compile
+|  |  |  |  |  |  +- io.springfox:springfox-oas:jar:3.0.0:compile
+|  |  |  |  |  |  |  \- io.swagger.core.v3:swagger-models:jar:2.1.2:compile
+|  |  |  |  |  |  +- io.springfox:springfox-bean-validators:jar:3.0.0:compile
+|  |  |  |  |  |  \- io.swagger:swagger-core:jar:1.5.22:compile
+|  |  |  |  |  |     +- com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:jar:2.13.5:compile
+|  |  |  |  |  |     +- com.google.guava:guava:jar:27.0.1-android:compile
+|  |  |  |  |  |     |  +- com.google.guava:failureaccess:jar:1.0.1:compile
+|  |  |  |  |  |     |  +- com.google.guava:listenablefuture:jar:9999.0-empty-to-avoid-conflict-with-guava:compile
+|  |  |  |  |  |     |  +- com.google.code.findbugs:jsr305:jar:3.0.2:compile
+|  |  |  |  |  |     |  +- org.checkerframework:checker-compat-qual:jar:2.5.2:compile
+|  |  |  |  |  |     |  +- com.google.errorprone:error_prone_annotations:jar:2.2.0:compile
+|  |  |  |  |  |     |  +- com.google.j2objc:j2objc-annotations:jar:1.1:compile
+|  |  |  |  |  |     |  \- org.codehaus.mojo:animal-sniffer-annotations:jar:1.17:compile
+|  |  |  |  |  |     \- javax.validation:validation-api:jar:2.0.1.Final:compile
+|  |  |  |  |  \- io.springfox:springfox-boot-starter:jar:3.0.0:compile
+|  |  |  |  |     \- io.springfox:springfox-data-rest:jar:3.0.0:compile
+|  |  |  |  \- com.github.xiaoymin:knife4j-spring-ui:jar:3.0.3:compile
+|  |  |  +- io.springfox:springfox-swagger2:jar:3.0.0:compile
+|  |  |  |  +- io.springfox:springfox-spi:jar:3.0.0:compile
+|  |  |  |  |  \- io.springfox:springfox-core:jar:3.0.0:compile
+|  |  |  |  |     \- net.bytebuddy:byte-buddy:jar:1.12.23:compile
+|  |  |  |  +- io.springfox:springfox-schema:jar:3.0.0:compile
+|  |  |  |  +- io.springfox:springfox-swagger-common:jar:3.0.0:compile
+|  |  |  |  |  \- io.swagger.core.v3:swagger-annotations:jar:2.1.2:compile
+|  |  |  |  +- io.springfox:springfox-spring-web:jar:3.0.0:compile
+|  |  |  |  |  \- io.github.classgraph:classgraph:jar:4.8.83:compile
+|  |  |  |  +- io.springfox:springfox-spring-webmvc:jar:3.0.0:compile
+|  |  |  |  +- io.springfox:springfox-spring-webflux:jar:3.0.0:compile
+|  |  |  |  +- org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile
+|  |  |  |  +- org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile
+|  |  |  |  \- org.mapstruct:mapstruct:jar:1.3.1.Final:runtime
+|  |  |  +- io.swagger:swagger-models:jar:1.6.2:compile
+|  |  |  \- io.swagger:swagger-annotations:jar:1.6.2:compile
+|  |  \- cn.hutool:hutool-all:jar:5.8.15:compile
++- javax.servlet:javax.servlet-api:jar:4.0.1:provided
++- io.projectreactor:reactor-core:jar:3.4.30:compile
+|  \- org.reactivestreams:reactive-streams:jar:1.0.4:compile
++- com.alibaba.fastjson2:fastjson2:jar:2.0.52:compile
++- io.jsonwebtoken:jjwt:jar:0.9.1:compile
++- org.springframework.boot:spring-boot-starter-validation:jar:2.7.13:compile
+|  \- org.apache.tomcat.embed:tomcat-embed-el:jar:9.0.76:compile
+\- org.hibernate.validator:hibernate-validator:jar:6.2.0.Final:compile
+   +- jakarta.validation:jakarta.validation-api:jar:2.0.2:compile
+   +- org.jboss.logging:jboss-logging:jar:3.4.3.Final:compile
+   \- com.fasterxml:classmate:jar:1.5.1:compile
