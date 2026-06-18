@@ -141,10 +141,98 @@ export interface SysPermissionNodeVO {
     name: string
     sortNo: number
     permission: string
+    projectCode: string
     level: number
     remark: string
     createTime: string
     children?: SysPermissionNodeVO[]
+}
+
+export interface SysPermissionSaveDTO {
+    id?: number
+    name: string
+    permission: string
+    parentId: number
+    sortNo: number
+    projectCode: string
+}
+
+export interface SysDeptNodeVO {
+    id: number
+    name: string
+    code: string
+    sortNo: number
+    parentId: number
+    parentPath: string
+    level: number
+    leaderUserId: number
+    leaderUserName: string
+    createTime: string
+    status: number
+    remark: string
+    children?: SysDeptNodeVO[]
+}
+
+export interface SysDeptSaveDTO {
+    id?: number
+    name: string
+    code: string
+    parentId: number
+    parentPath?: string
+    sortNo: number
+    leaderUserId?: number
+    status: number
+    level?: number
+    remark?: string
+}
+
+export interface SysPostVO {
+    id: number
+    name: string
+    code: string
+    sortNo: number
+    status: number
+    createTime: string
+    updateTime: string
+    remark: string
+}
+
+export interface SysPostSaveDTO {
+    id?: number
+    name: string
+    code: string
+    sortNo: number
+    status: number
+    remark?: string
+}
+
+export interface SysDictTypeVO {
+    id: number
+    name: string
+    code: string
+    status: number
+    createTime: string
+    updateTime: string
+    remark: string
+}
+
+export interface SysDictDataVO {
+    id: number
+    sortNo: number
+    label: string
+    value: string
+    code: string
+    isDefault: number
+    status: number
+    createTime: string
+    updateTime: string
+    remark: string
+}
+
+export interface SysDictGroupVO {
+    name: string
+    code: string
+    dicts: SysDictDataVO[]
 }
 
 // 通用响应

@@ -819,8 +819,8 @@ VALUES
 -- ----------------------------
 INSERT INTO `sys_user` (`id`, `tenant_id`, `dept_id`, `account`, `password`, `salt`, `name`, `email`, `phone`, `sex`, `avatar`, `status`, `deleted`, `create_time`, `create_user_id`, `create_user`, `update_time`, `update_user_id`, `update_user`, `remark`, `identity`, `type`, `initialize_password_change`)
 SELECT 1, 0, d.id, 'admin',
-       '$2a$10$d7EegjNv76WG5GGmYT56heLo9UfmWCP73Yh04b.yRycnW3imzL2be',
-       'x0jdch', '管理员', 'admin@example.com', '13500000000', '0',
+       '$2a$10$0a22a59ac468fe43853abOVa.6V08YEF00tG4oTUpCzT5uzhBnTbC',
+       'g8arzw', '管理员', 'admin@example.com', '13500000000', '0',
        '/20240926/2da4b1e378c74bbcbeb35c4b9ec733e1.png',
        1, 0, NOW(), 0, 'system', NOW(), 0, 'system', '系统管理员', '', 1, 1
 FROM `sys_dept` d
@@ -834,8 +834,8 @@ INSERT INTO `sys_menu` (`name`, `parent_id`, `sort_no`, `path_type`, `path`, `co
 VALUES
 ('首页', 0, 1, 'component', '/home', 'home/home', 'menuItem', 'C', 1, 1, 1, 0, 'system:home', 'HomeOutlined', 1, 'system', NOW(), NOW(), '系统首页', 0, '/'),
 ('系统管理', 0, 2, 'layout', '/setting', NULL, 'menuItem', 'M', 1, 1, 0, 0, 'system:setting', 'SettingOutlined', 1, 'system', NOW(), NOW(), '系统管理模块', 0, '/'),
-('用户中心', 0, 3, 'component', '/userCenter', 'userCenter/userCenter', 'menuItem', 'F', 1, 1, 1, 0, 'system:userCenter', 'UserOutlined', 1, 'system', NOW(), NOW(), '个人中心', 0, '0'),
-('修改密码', 0, 4, 'component', '/changePassword', 'changePassword/changePassword', 'menuItem', 'F', 1, 1, 1, 0, 'system:changePassword', 'LockOutlined', 1, 'system', NOW(), NOW(), '修改登录密码', 0, '0');
+('用户中心', 0, 3, 'component', '/userCenter', 'userCenter/userCenter', 'menuItem', 'C', 0, 1, 1, 0, 'system:userCenter', 'UserOutlined', 1, 'system', NOW(), NOW(), '个人中心', 0, '/'),
+('修改密码', 0, 4, 'component', '/changePassword', 'changePassword/changePassword', 'menuItem', 'C', 0, 1, 1, 0, 'system:changePassword', 'LockOutlined', 1, 'system', NOW(), NOW(), '修改登录密码', 0, '/');
 
 -- ----------------------------
 -- Seed: sys_menu (系统管理 二级菜单, parent_id 通过 key 子查询)

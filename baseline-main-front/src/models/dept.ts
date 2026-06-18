@@ -3,51 +3,52 @@ import Servpost from "@/utils/Servpost"
 import { IAPI } from "@/utils/ServpostInterface"
 import { message as Message } from "antd"
 import { responseData, responseOk } from "@/utils/apiResponse"
-import type { SysMenuNodeVO } from "@/utils/types"
+import type { SysDeptNodeVO, SysDeptSaveDTO } from "@/utils/types"
 
-const BASE = "/api/system/adminApi/menu"
+const BASE = "/api/system/adminApi/dept"
 
-interface MenuFilter {
+interface DeptFilter {
     name?: string
-    projectCode?: string
+    code?: string
+    status?: number
 }
 
-interface MenuLoading {
-    tree: boolean
+interface DeptLoading {
+    list: boolean
     save: boolean
     detail: boolean
     remove: boolean
 }
 
-export interface MenuState {
-    tree: SysMenuNodeVO[]
-    filter: MenuFilter
-    detail: SysMenuNodeVO | null
-    loading: MenuLoading
+export interface DeptState {
+    list: SysDeptNodeVO[]
+    filter: DeptFilter
+    detail: SysDeptSaveDTO | null
+    loading: DeptLoading
 }
 
-const MenuModel = {
-    namespace: "menu",
+const DeptModel = {
+    namespace: "dept",
     state: {
-        tree: [],
+        list: [],
         filter: {},
         detail: null,
-        loading: { tree: false, save: false, detail: false, remove: false },
-    } as MenuState,
+        loading: { list: false, save: false, detail: false, remove: false },
+    } as DeptState,
     effects: {
-        *fetchTree({ payload }: any, { put, select }: any): any {
-            yield put({ type: "setLoading", payload: { key: "tree", value: true } })
+        *fetchList({ payload }: any, { put, select }: any): any {
+            yield put({ type: "setLoading", payload: { key: "list", value: true } })
             try {
-                const stateFilter = yield select((s: any) => s.menu.filter)
+                const stateFilter = yield select((s: any) => s.dept.filter)
                 const filter = { ...stateFilter, ...(payload || {}) }
-                const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/tree`, data: filter, methods: "post" })
+                const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/list`, data: filter, methods: "post" })
                 if (responseOk(res)) {
-                    yield put({ type: "saveTree", payload: responseData<SysMenuNodeVO[]>(res) || [] })
+                    yield put({ type: "saveList", payload: responseData<SysDeptNodeVO[]>(res) || [] })
                 } else {
-                    Message.error(res?.message || "获取菜单树失败")
+                    Message.error(res?.message || "获取部门列表失败")
                 }
             } finally {
-                yield put({ type: "setLoading", payload: { key: "tree", value: false } })
+                yield put({ type: "setLoading", payload: { key: "list", value: false } })
             }
         },
         *fetchDetail({ payload }: any, { put }: any): any {
@@ -57,7 +58,7 @@ const MenuModel = {
                 if (responseOk(res)) {
                     yield put({ type: "saveDetail", payload: responseData(res) })
                 } else {
-                    Message.error(res?.message || "获取菜单详情失败")
+                    Message.error(res?.message || "获取部门详情失败")
                 }
             } finally {
                 yield put({ type: "setLoading", payload: { key: "detail", value: false } })
@@ -69,8 +70,8 @@ const MenuModel = {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/saveOrUpdate`, data: payload, methods: "post" })
                 if (responseOk(res)) {
                     Message.success("保存成功")
-                    yield put({ type: "fetchTree" })
-                    yield put({ type: "dict/invalidate", payload: "menuTree" })
+                    yield put({ type: "fetchList" })
+                    yield put({ type: "dict/invalidate", payload: "deptTree" })
                     callback?.(true)
                 } else {
                     Message.error(res?.message || "保存失败")
@@ -86,8 +87,8 @@ const MenuModel = {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/remove`, data: payload, methods: "post" })
                 if (responseOk(res)) {
                     Message.success("删除成功")
-                    yield put({ type: "fetchTree" })
-                    yield put({ type: "dict/invalidate", payload: "menuTree" })
+                    yield put({ type: "fetchList" })
+                    yield put({ type: "dict/invalidate", payload: "deptTree" })
                     callback?.(true)
                 } else {
                     Message.error(res?.message || "删除失败")
@@ -102,15 +103,15 @@ const MenuModel = {
         },
     },
     reducers: {
-        saveTree: ((state: any, action: any) => ({ ...state, tree: action.payload })) as Reducer<any>,
+        saveList: ((state: any, action: any) => ({ ...state, list: action.payload })) as Reducer<any>,
         saveDetail: ((state: any, action: any) => ({ ...state, detail: action.payload })) as Reducer<any>,
         mergeFilter: ((state: any, action: any) => ({ ...state, filter: { ...state.filter, ...action.payload } })) as Reducer<any>,
         setLoading: ((state: any, action: any) => ({
             ...state,
             loading: { ...state.loading, [action.payload.key]: action.payload.value },
         })) as Reducer<any>,
-        reset: (() => ({ tree: [], filter: {}, detail: null, loading: { tree: false, save: false, detail: false, remove: false } })) as Reducer<any>,
+        reset: (() => ({ list: [], filter: {}, detail: null, loading: { list: false, save: false, detail: false, remove: false } })) as Reducer<any>,
     },
 }
 
-export default MenuModel
+export default DeptModel

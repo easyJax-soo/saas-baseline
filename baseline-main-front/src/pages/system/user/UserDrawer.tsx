@@ -1,6 +1,7 @@
 import React, { useEffect } from "react"
 import { Drawer, Form, Input, Select, TreeSelect, Switch, Radio, Button, Space, Spin, Divider } from "antd"
 import { useDispatch, useSelector } from "umi"
+import { toNumber, toStringIdArray } from "@/utils/normalize"
 
 interface Props {
     open: boolean
@@ -35,6 +36,11 @@ const UserDrawer: React.FC<Props> = ({ open, id, onClose }) => {
             form.setFieldsValue({
                 ...detail,
                 password: undefined,
+                deptId: detail.deptId ? String(detail.deptId) : undefined,
+                sex: toNumber(detail.sex),
+                status: toNumber(detail.status),
+                roleIds: toStringIdArray(detail.roleIds),
+                postIds: toStringIdArray(detail.postIds),
             })
         } else if (!isEdit) {
             form.resetFields()
@@ -54,7 +60,7 @@ const UserDrawer: React.FC<Props> = ({ open, id, onClose }) => {
         })
     }
 
-    const buildTreeData = (nodes: any[]): any[] => nodes?.map((n: any) => ({ title: n.name, key: n.id, value: n.id, children: buildTreeData(n.children || []) })) || []
+    const buildTreeData = (nodes: any[]): any[] => nodes?.map((n: any) => ({ title: n.name, key: String(n.id), value: String(n.id), children: buildTreeData(n.children || []) })) || []
 
     return (
         <Drawer
@@ -128,15 +134,15 @@ const UserDrawer: React.FC<Props> = ({ open, id, onClose }) => {
                         角色与岗位
                     </Divider>
                     <Form.Item name="roleIds" label="角色">
-                        <Select mode="multiple" placeholder="请选择角色" allowClear options={dict.simpleRoles?.map((r: any) => ({ label: r.name, value: r.id }))} />
+                        <Select mode="multiple" placeholder="请选择角色" allowClear options={dict.simpleRoles?.map((r: any) => ({ label: r.name, value: String(r.id) }))} />
                     </Form.Item>
                     <Form.Item name="postIds" label="岗位">
-                        <Select mode="multiple" placeholder="请选择岗位" allowClear options={dict.postList?.map((p: any) => ({ label: p.name, value: p.id }))} />
+                        <Select mode="multiple" placeholder="请选择岗位" allowClear options={dict.postList?.map((p: any) => ({ label: p.name, value: String(p.id) }))} />
                     </Form.Item>
                     <Divider orientation="left" plain>
                         其他
                     </Divider>
-                    <Form.Item name="status" label="状态" getValueFromEvent={(v: boolean) => (v ? 1 : 0)} getValueProps={(v: number) => ({ checked: v === 1 })}>
+                    <Form.Item name="status" label="状态" getValueFromEvent={(v: boolean) => (v ? 1 : 0)} getValueProps={(v: number | string) => ({ checked: toNumber(v) === 1 })}>
                         <Switch checkedChildren="启用" unCheckedChildren="禁用" />
                     </Form.Item>
                     <Form.Item name="remark" label="备注">

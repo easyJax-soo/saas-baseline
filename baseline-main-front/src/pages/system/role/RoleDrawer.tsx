@@ -3,6 +3,7 @@ import { Drawer, Form, Input, Select, Button, Space, Spin, Tabs, Tree, Checkbox 
 import { useDispatch, useSelector } from "umi"
 import DataScopeRadio from "./DataScopeRadio"
 import { DataScope } from "@/constants/dataScope"
+import { toNumber, toStringIdArray } from "@/utils/normalize"
 
 interface Props {
     open: boolean
@@ -17,9 +18,9 @@ const RoleDrawer: React.FC<Props> = ({ open, id, onClose }) => {
     const dict = useSelector((s: any) => s.dict)
     const dataScopeWatch = Form.useWatch("dataScope", form)
     const dataScope: number = dataScopeWatch ?? DataScope.ALL
-    const [checkedMenuKeys, setCheckedMenuKeys] = useState<number[]>([])
-    const [checkedPermKeys, setCheckedPermKeys] = useState<number[]>([])
-    const [checkedDeptKeys, setCheckedDeptKeys] = useState<number[]>([])
+    const [checkedMenuKeys, setCheckedMenuKeys] = useState<string[]>([])
+    const [checkedPermKeys, setCheckedPermKeys] = useState<string[]>([])
+    const [checkedDeptKeys, setCheckedDeptKeys] = useState<string[]>([])
     const [selectedProjects, setSelectedProjects] = useState<string[]>([])
 
     const isEdit = !!id
@@ -42,13 +43,13 @@ const RoleDrawer: React.FC<Props> = ({ open, id, onClose }) => {
             form.setFieldsValue({
                 name: detail.name,
                 key: detail.key,
-                status: detail.status,
-                dataScope: detail.dataScope,
+                status: toNumber(detail.status),
+                dataScope: toNumber(detail.dataScope),
                 remark: detail.remark,
             })
-            setCheckedMenuKeys(detail.menuIds || [])
-            setCheckedPermKeys(detail.permissionIds || [])
-            setCheckedDeptKeys(detail.deptIds || [])
+            setCheckedMenuKeys(toStringIdArray(detail.menuIds))
+            setCheckedPermKeys(toStringIdArray(detail.permissionIds))
+            setCheckedDeptKeys(toStringIdArray(detail.deptIds))
             setSelectedProjects(detail.projectCodes || [])
         } else if (!isEdit) {
             form.resetFields()
@@ -79,7 +80,7 @@ const RoleDrawer: React.FC<Props> = ({ open, id, onClose }) => {
         })
     }
 
-    const buildTreeData = (nodes: any[]): any[] => nodes?.map((n: any) => ({ title: n.name, key: n.id, children: buildTreeData(n.children || []) })) || []
+    const buildTreeData = (nodes: any[]): any[] => nodes?.map((n: any) => ({ title: n.name, key: String(n.id), children: buildTreeData(n.children || []) })) || []
 
     return (
         <Drawer

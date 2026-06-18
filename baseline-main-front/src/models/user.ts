@@ -2,6 +2,7 @@ import { type Reducer } from "umi"
 import Servpost from "@/utils/Servpost"
 import { IAPI } from "@/utils/ServpostInterface"
 import { message as Message } from "antd"
+import { responseData, responseOk } from "@/utils/apiResponse"
 import type { SysUserPageVO, SysUserDetailVO, PageResult } from "@/utils/types"
 
 const BASE = "/api/system/adminApi/user"
@@ -45,13 +46,14 @@ const UserModel = {
         loading: { list: false, save: false, detail: false, remove: false, resetPwd: false },
     } as UserState,
     effects: {
-        *fetchPage(_: any, { put, select }: any): any {
+        *fetchPage({ payload }: any, { put, select }: any): any {
             yield put({ type: "setLoading", payload: { key: "list", value: true } })
             try {
-                const filter = yield select((s: any) => s.user.filter)
+                const stateFilter = yield select((s: any) => s.user.filter)
+                const filter = { ...stateFilter, ...(payload || {}) }
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/page`, data: filter, methods: "post" })
-                if (res?.status === 200) {
-                    const page = res.data as PageResult<SysUserPageVO>
+                if (responseOk(res)) {
+                    const page = responseData<PageResult<SysUserPageVO>>(res)
                     yield put({ type: "saveList", payload: { list: page.records || [], total: page.total || 0 } })
                 } else {
                     Message.error(res?.message || "获取用户列表失败")
@@ -64,8 +66,8 @@ const UserModel = {
             yield put({ type: "setLoading", payload: { key: "detail", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/detail`, data: { id: payload }, methods: "post" })
-                if (res?.status === 200) {
-                    yield put({ type: "saveDetail", payload: res.data })
+                if (responseOk(res)) {
+                    yield put({ type: "saveDetail", payload: responseData(res) })
                 } else {
                     Message.error(res?.message || "获取用户详情失败")
                 }
@@ -77,7 +79,7 @@ const UserModel = {
             yield put({ type: "setLoading", payload: { key: "save", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/saveOrUpdate`, data: payload, methods: "post" })
-                if (res?.status === 200 && res.data !== false) {
+                if (responseOk(res)) {
                     Message.success("保存成功")
                     yield put({ type: "fetchPage" })
                     callback?.(true)
@@ -93,7 +95,7 @@ const UserModel = {
             yield put({ type: "setLoading", payload: { key: "remove", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/remove`, data: payload, methods: "post" })
-                if (res?.status === 200 && res.data !== false) {
+                if (responseOk(res)) {
                     Message.success("删除成功")
                     yield put({ type: "fetchPage" })
                     callback?.(true)
@@ -109,7 +111,7 @@ const UserModel = {
             yield put({ type: "setLoading", payload: { key: "resetPwd", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/resetPw`, data: payload, methods: "post" })
-                if (res?.status === 200 && res.data !== false) {
+                if (responseOk(res)) {
                     Message.success("密码重置成功")
                     callback?.(true)
                 } else {

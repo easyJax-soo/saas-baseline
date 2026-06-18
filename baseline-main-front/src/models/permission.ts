@@ -3,48 +3,49 @@ import Servpost from "@/utils/Servpost"
 import { IAPI } from "@/utils/ServpostInterface"
 import { message as Message } from "antd"
 import { responseData, responseOk } from "@/utils/apiResponse"
-import type { SysMenuNodeVO } from "@/utils/types"
+import type { SysPermissionNodeVO, SysPermissionSaveDTO } from "@/utils/types"
 
-const BASE = "/api/system/adminApi/menu"
+const BASE = "/api/system/adminApi/sysPermission"
 
-interface MenuFilter {
+interface PermissionFilter {
     name?: string
+    permission?: string
     projectCode?: string
 }
 
-interface MenuLoading {
+interface PermissionLoading {
     tree: boolean
     save: boolean
     detail: boolean
     remove: boolean
 }
 
-export interface MenuState {
-    tree: SysMenuNodeVO[]
-    filter: MenuFilter
-    detail: SysMenuNodeVO | null
-    loading: MenuLoading
+export interface PermissionState {
+    tree: SysPermissionNodeVO[]
+    filter: PermissionFilter
+    detail: SysPermissionSaveDTO | null
+    loading: PermissionLoading
 }
 
-const MenuModel = {
-    namespace: "menu",
+const PermissionModel = {
+    namespace: "permission",
     state: {
         tree: [],
         filter: {},
         detail: null,
         loading: { tree: false, save: false, detail: false, remove: false },
-    } as MenuState,
+    } as PermissionState,
     effects: {
         *fetchTree({ payload }: any, { put, select }: any): any {
             yield put({ type: "setLoading", payload: { key: "tree", value: true } })
             try {
-                const stateFilter = yield select((s: any) => s.menu.filter)
+                const stateFilter = yield select((s: any) => s.permission.filter)
                 const filter = { ...stateFilter, ...(payload || {}) }
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/tree`, data: filter, methods: "post" })
                 if (responseOk(res)) {
-                    yield put({ type: "saveTree", payload: responseData<SysMenuNodeVO[]>(res) || [] })
+                    yield put({ type: "saveTree", payload: responseData<SysPermissionNodeVO[]>(res) || [] })
                 } else {
-                    Message.error(res?.message || "获取菜单树失败")
+                    Message.error(res?.message || "获取权限树失败")
                 }
             } finally {
                 yield put({ type: "setLoading", payload: { key: "tree", value: false } })
@@ -57,7 +58,7 @@ const MenuModel = {
                 if (responseOk(res)) {
                     yield put({ type: "saveDetail", payload: responseData(res) })
                 } else {
-                    Message.error(res?.message || "获取菜单详情失败")
+                    Message.error(res?.message || "获取权限详情失败")
                 }
             } finally {
                 yield put({ type: "setLoading", payload: { key: "detail", value: false } })
@@ -70,7 +71,7 @@ const MenuModel = {
                 if (responseOk(res)) {
                     Message.success("保存成功")
                     yield put({ type: "fetchTree" })
-                    yield put({ type: "dict/invalidate", payload: "menuTree" })
+                    yield put({ type: "dict/invalidate", payload: "permTree" })
                     callback?.(true)
                 } else {
                     Message.error(res?.message || "保存失败")
@@ -87,7 +88,7 @@ const MenuModel = {
                 if (responseOk(res)) {
                     Message.success("删除成功")
                     yield put({ type: "fetchTree" })
-                    yield put({ type: "dict/invalidate", payload: "menuTree" })
+                    yield put({ type: "dict/invalidate", payload: "permTree" })
                     callback?.(true)
                 } else {
                     Message.error(res?.message || "删除失败")
@@ -113,4 +114,4 @@ const MenuModel = {
     },
 }
 
-export default MenuModel
+export default PermissionModel

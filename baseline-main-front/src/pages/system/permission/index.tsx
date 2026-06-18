@@ -1,95 +1,70 @@
 import React, { useEffect, useState } from "react"
 import { Card, Table, Form, Input, Select, Button, Space, Tag, Modal } from "antd"
-import { PlusOutlined, SearchOutlined, ReloadOutlined, FolderOutlined, FileOutlined, CodeOutlined } from "@ant-design/icons"
+import { PlusOutlined, SearchOutlined, ReloadOutlined, SafetyCertificateOutlined } from "@ant-design/icons"
 import { useDispatch, useSelector } from "umi"
 import PermButton from "@/pages/common/PermButton"
 import { PERMS } from "@/constants/perms"
-import MenuDrawer from "./MenuDrawer"
-import type { SysMenuNodeVO } from "@/utils/types"
-import { toNumber } from "@/utils/normalize"
+import PermissionDrawer from "./PermissionDrawer"
+import type { SysPermissionNodeVO } from "@/utils/types"
 
-const typeIcon: Record<string, React.ReactNode> = {
-    M: <FolderOutlined style={{ color: "#faad14" }} />,
-    C: <FileOutlined style={{ color: "#1890ff" }} />,
-    F: <CodeOutlined style={{ color: "#52c41a" }} />,
-}
-
-const typeText: Record<string, string> = { M: "目录", C: "页面", F: "按钮" }
-
-const MenuPage: React.FC = () => {
+const PermissionPage: React.FC = () => {
     const dispatch = useDispatch()
-    const { tree, loading } = useSelector((s: any) => s.menu)
+    const { tree, loading } = useSelector((s: any) => s.permission)
     const [drawerOpen, setDrawerOpen] = useState(false)
     const [drawerId, setDrawerId] = useState<number | undefined>(undefined)
     const [parentId, setParentId] = useState<number | undefined>(undefined)
     const [form] = Form.useForm()
 
     useEffect(() => {
-        dispatch({ type: "menu/fetchTree" })
+        dispatch({ type: "permission/fetchTree" })
     }, [])
 
     const handleSearch = () => {
         const payload = form.getFieldsValue()
-        dispatch({ type: "menu/saveFilter", payload })
-        dispatch({ type: "menu/fetchTree", payload })
+        dispatch({ type: "permission/saveFilter", payload })
+        dispatch({ type: "permission/fetchTree", payload })
     }
 
     const handleReset = () => {
         form.resetFields()
         const payload = {}
-        dispatch({ type: "menu/saveFilter", payload })
-        dispatch({ type: "menu/fetchTree", payload })
+        dispatch({ type: "permission/saveFilter", payload })
+        dispatch({ type: "permission/fetchTree", payload })
     }
 
-    const handleRemove = (record: SysMenuNodeVO) => {
+    const handleRemove = (record: SysPermissionNodeVO) => {
         Modal.confirm({
             title: "确认删除",
-            content: `确定要删除「${record.name}」吗？若有子菜单将一并删除。`,
-            onOk: () => {
-                dispatch({ type: "menu/remove", payload: [record.id] })
-            },
+            content: `确定要删除「${record.name}」吗？若有子权限将一并删除。`,
+            onOk: () => dispatch({ type: "permission/remove", payload: [record.id] }),
         })
     }
 
     const columns = [
         {
-            title: "菜单名称",
+            title: "权限名称",
             dataIndex: "name",
             key: "name",
-            render: (_: string, record: SysMenuNodeVO) => (
+            render: (name: string, record: SysPermissionNodeVO) => (
                 <Space>
-                    {typeIcon[record.type] || null}
-                    <span>{record.name}</span>
-                    {record.type === "F" && record.key && <Tag style={{ fontSize: 11 }}>{record.key}</Tag>}
+                    <SafetyCertificateOutlined style={{ color: "#1890ff" }} />
+                    <span>{name}</span>
+                    {record.permission && <Tag style={{ fontSize: 11 }}>{record.permission}</Tag>}
                 </Space>
             ),
         },
-        { title: "类型", dataIndex: "type", key: "type", width: 70, render: (v: string) => typeText[v] || v },
-        { title: "路由", dataIndex: "path", key: "path", width: 200, ellipsis: true },
-        { title: "排序", dataIndex: "sortNo", key: "sortNo", width: 60 },
-        {
-            title: "可见",
-            dataIndex: "visible",
-            key: "visible",
-            width: 60,
-            render: (v: number | string) => (toNumber(v) === 1 ? <Tag color="blue">是</Tag> : <Tag>否</Tag>),
-        },
-        {
-            title: "状态",
-            dataIndex: "status",
-            key: "status",
-            width: 60,
-            render: (v: number | string) => (toNumber(v) === 1 ? <Tag color="green">启用</Tag> : <Tag color="red">禁用</Tag>),
-        },
-        { title: "创建时间", dataIndex: "createTime", key: "createTime", width: 160 },
+        { title: "权限标识", dataIndex: "permission", key: "permission", width: 260, ellipsis: true },
+        { title: "项目码", dataIndex: "projectCode", key: "projectCode", width: 120 },
+        { title: "排序", dataIndex: "sortNo", key: "sortNo", width: 80 },
+        { title: "创建时间", dataIndex: "createTime", key: "createTime", width: 180 },
         {
             title: "操作",
             key: "action",
-            width: 200,
-            render: (_: any, record: SysMenuNodeVO) => (
+            width: 220,
+            render: (_: any, record: SysPermissionNodeVO) => (
                 <Space size="small">
                     <PermButton
-                        perm={PERMS.menu.add}
+                        perm={PERMS.permission.add}
                         type="link"
                         size="small"
                         onClick={() => {
@@ -98,10 +73,10 @@ const MenuPage: React.FC = () => {
                             setDrawerOpen(true)
                         }}
                     >
-                        +子菜单
+                        +子权限
                     </PermButton>
                     <PermButton
-                        perm={PERMS.menu.edit}
+                        perm={PERMS.permission.edit}
                         type="link"
                         size="small"
                         onClick={() => {
@@ -112,7 +87,7 @@ const MenuPage: React.FC = () => {
                     >
                         编辑
                     </PermButton>
-                    <PermButton perm={PERMS.menu.del} type="link" size="small" danger onClick={() => handleRemove(record)}>
+                    <PermButton perm={PERMS.permission.del} type="link" size="small" danger onClick={() => handleRemove(record)}>
                         删除
                     </PermButton>
                 </Space>
@@ -125,10 +100,14 @@ const MenuPage: React.FC = () => {
             <Card size="small" style={{ marginBottom: 8 }}>
                 <Form form={form} layout="inline" style={{ flexWrap: "wrap", gap: 8 }}>
                     <Form.Item name="name">
-                        <Input placeholder="菜单名称" allowClear />
+                        <Input placeholder="权限名称" allowClear />
+                    </Form.Item>
+                    <Form.Item name="permission">
+                        <Input placeholder="权限标识" allowClear />
                     </Form.Item>
                     <Form.Item name="projectCode">
                         <Select placeholder="项目码" allowClear style={{ width: 150 }}>
+                            <Select.Option value="system">system</Select.Option>
                             <Select.Option value="BASELINE">BASELINE</Select.Option>
                         </Select>
                     </Form.Item>
@@ -147,7 +126,7 @@ const MenuPage: React.FC = () => {
             <Card size="small">
                 <div style={{ marginBottom: 12 }}>
                     <PermButton
-                        perm={PERMS.menu.add}
+                        perm={PERMS.permission.add}
                         type="primary"
                         icon={<PlusOutlined />}
                         onClick={() => {
@@ -156,12 +135,12 @@ const MenuPage: React.FC = () => {
                             setDrawerOpen(true)
                         }}
                     >
-                        新增根菜单
+                        新增根权限
                     </PermButton>
                 </div>
                 <Table rowKey="id" dataSource={tree} columns={columns} loading={loading.tree} pagination={false} defaultExpandAllRows />
             </Card>
-            <MenuDrawer
+            <PermissionDrawer
                 open={drawerOpen}
                 id={drawerId}
                 parentId={parentId}
@@ -175,4 +154,4 @@ const MenuPage: React.FC = () => {
     )
 }
 
-export default MenuPage
+export default PermissionPage

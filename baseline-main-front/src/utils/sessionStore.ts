@@ -27,8 +27,8 @@ export interface SysMenuNode {
     path: string
     component: string
     type: "M" | "C" | "F"
-    visible: number
-    status: number
+    visible: string
+    status: string
     icon: string
     key: string
     sortNo: number

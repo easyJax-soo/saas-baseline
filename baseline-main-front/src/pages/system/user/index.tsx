@@ -7,6 +7,7 @@ import { PERMS } from "@/constants/perms"
 import UserDrawer from "./UserDrawer"
 import ResetPwdModal from "./ResetPwdModal"
 import type { SysUserPageVO } from "@/utils/types"
+import { toNumber } from "@/utils/normalize"
 
 const UserPage: React.FC = () => {
     const dispatch = useDispatch()
@@ -22,15 +23,16 @@ const UserPage: React.FC = () => {
     }, [])
 
     const handleSearch = () => {
-        const vals = form.getFieldsValue()
-        dispatch({ type: "user/saveFilter", payload: vals })
-        dispatch({ type: "user/fetchPage" })
+        const payload = { ...form.getFieldsValue(), current: 1 }
+        dispatch({ type: "user/saveFilter", payload })
+        dispatch({ type: "user/fetchPage", payload })
     }
 
     const handleReset = () => {
         form.resetFields()
-        dispatch({ type: "user/saveFilter", payload: {} })
-        dispatch({ type: "user/fetchPage" })
+        const payload = { current: 1, size: filter.size }
+        dispatch({ type: "user/saveFilter", payload })
+        dispatch({ type: "user/fetchPage", payload })
     }
 
     const handleAdd = () => {
@@ -73,7 +75,7 @@ const UserPage: React.FC = () => {
             title: "状态",
             dataIndex: "status",
             key: "status",
-            render: (v: number) => (v === 1 ? <Tag color="green">启用</Tag> : <Tag color="red">禁用</Tag>),
+            render: (v: number | string) => (toNumber(v) === 1 ? <Tag color="green">启用</Tag> : <Tag color="red">禁用</Tag>),
         },
         { title: "创建时间", dataIndex: "createTime", key: "createTime" },
         {
@@ -146,8 +148,9 @@ const UserPage: React.FC = () => {
                         pageSize: filter.size,
                         total,
                         onChange: (page, size) => {
-                            dispatch({ type: "user/pageChange", payload: { current: page, size } })
-                            dispatch({ type: "user/fetchPage" })
+                            const payload = { current: page, size }
+                            dispatch({ type: "user/pageChange", payload })
+                            dispatch({ type: "user/fetchPage", payload })
                         },
                         showSizeChanger: true,
                         showTotal: (t: number) => `共 ${t} 条`,

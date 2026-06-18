@@ -1,6 +1,7 @@
 import React, { useEffect } from "react"
 import { Drawer, Form, Input, TreeSelect, Radio, InputNumber, Switch, Button, Space, Spin, Select } from "antd"
 import { useDispatch, useSelector } from "umi"
+import { toNumber } from "@/utils/normalize"
 
 interface Props {
     open: boolean
@@ -32,7 +33,14 @@ const MenuDrawer: React.FC<Props> = ({ open, id, parentId, onClose }) => {
 
     useEffect(() => {
         if (isEdit && detail) {
-            form.setFieldsValue(detail)
+            form.setFieldsValue({
+                ...detail,
+                parentId: toNumber(detail.parentId),
+                sortNo: toNumber(detail.sortNo),
+                visible: toNumber(detail.visible),
+                status: toNumber(detail.status),
+                cache: toNumber(detail.cache),
+            })
         } else if (!isEdit) {
             form.resetFields()
             form.setFieldsValue({ type: "M", status: 1, visible: 1, cache: 1, sortNo: 0, parentId: parentId || 0 })
@@ -136,12 +144,12 @@ const MenuDrawer: React.FC<Props> = ({ open, id, parentId, onClose }) => {
                         </Select>
                     </Form.Item>
                     {menuType !== "F" && (
-                        <Form.Item name="visible" label="是否可见" getValueFromEvent={(v: boolean) => (v ? 1 : 0)} getValueProps={(v: number) => ({ checked: v === 1 })}>
+                        <Form.Item name="visible" label="是否可见" getValueFromEvent={(v: boolean) => (v ? 1 : 0)} getValueProps={(v: number | string) => ({ checked: toNumber(v) === 1 })}>
                             <Switch checkedChildren="可见" unCheckedChildren="隐藏" />
                         </Form.Item>
                     )}
                     {menuType === "C" && (
-                        <Form.Item name="cache" label="是否缓存" getValueFromEvent={(v: boolean) => (v ? 1 : 0)} getValueProps={(v: number) => ({ checked: v === 1 })}>
+                        <Form.Item name="cache" label="是否缓存" getValueFromEvent={(v: boolean) => (v ? 1 : 0)} getValueProps={(v: number | string) => ({ checked: toNumber(v) === 1 })}>
                             <Switch checkedChildren="缓存" unCheckedChildren="不缓存" />
                         </Form.Item>
                     )}

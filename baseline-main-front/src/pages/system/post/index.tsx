@@ -4,34 +4,33 @@ import { PlusOutlined, SearchOutlined, ReloadOutlined } from "@ant-design/icons"
 import { useDispatch, useSelector } from "umi"
 import PermButton from "@/pages/common/PermButton"
 import { PERMS } from "@/constants/perms"
-import { DATA_SCOPE_TEXT } from "@/constants/dataScope"
-import RoleDrawer from "./RoleDrawer"
-import type { SysRolePageVO } from "@/utils/types"
+import PostDrawer from "./PostDrawer"
+import type { SysPostVO } from "@/utils/types"
 import { toNumber } from "@/utils/normalize"
 
-const RolePage: React.FC = () => {
+const PostPage: React.FC = () => {
     const dispatch = useDispatch()
-    const { list, total, filter, loading } = useSelector((s: any) => s.role)
+    const { list, total, filter, loading } = useSelector((s: any) => s.post)
     const [drawerOpen, setDrawerOpen] = useState(false)
     const [drawerId, setDrawerId] = useState<number | undefined>(undefined)
     const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([])
     const [form] = Form.useForm()
 
     useEffect(() => {
-        dispatch({ type: "role/fetchPage" })
+        dispatch({ type: "post/fetchPage" })
     }, [])
 
     const handleSearch = () => {
         const payload = { ...form.getFieldsValue(), current: 1 }
-        dispatch({ type: "role/saveFilter", payload })
-        dispatch({ type: "role/fetchPage", payload })
+        dispatch({ type: "post/saveFilter", payload })
+        dispatch({ type: "post/fetchPage", payload })
     }
 
     const handleReset = () => {
         form.resetFields()
         const payload = { current: 1, size: filter.size }
-        dispatch({ type: "role/saveFilter", payload })
-        dispatch({ type: "role/fetchPage", payload })
+        dispatch({ type: "post/saveFilter", payload })
+        dispatch({ type: "post/fetchPage", payload })
     }
 
     const handleBatchRemove = () => {
@@ -39,26 +38,19 @@ const RolePage: React.FC = () => {
         Modal.confirm({
             title: "确认批量删除",
             content: `确定要删除选中的 ${selectedRowKeys.length} 条记录吗？`,
-            onOk: () => dispatch({ type: "role/remove", payload: selectedRowKeys, callback: () => setSelectedRowKeys([]) }),
+            onOk: () => dispatch({ type: "post/remove", payload: selectedRowKeys, callback: () => setSelectedRowKeys([]) }),
         })
     }
 
     const columns = [
-        { title: "角色名称", dataIndex: "name", key: "name" },
-        { title: "角色标识", dataIndex: "key", key: "key" },
-        {
-            title: "数据范围",
-            dataIndex: "dataScope",
-            key: "dataScope",
-            render: (v: number | string) => {
-                const dataScope = toNumber(v)
-                return DATA_SCOPE_TEXT[dataScope as keyof typeof DATA_SCOPE_TEXT] || v
-            },
-        },
+        { title: "岗位名称", dataIndex: "name", key: "name" },
+        { title: "岗位编码", dataIndex: "code", key: "code" },
+        { title: "排序", dataIndex: "sortNo", key: "sortNo", width: 80 },
         {
             title: "状态",
             dataIndex: "status",
             key: "status",
+            width: 90,
             render: (v: number | string) => (toNumber(v) === 1 ? <Tag color="green">启用</Tag> : <Tag color="red">禁用</Tag>),
         },
         { title: "创建时间", dataIndex: "createTime", key: "createTime" },
@@ -66,10 +58,10 @@ const RolePage: React.FC = () => {
             title: "操作",
             key: "action",
             width: 160,
-            render: (_: any, record: SysRolePageVO) => (
+            render: (_: any, record: SysPostVO) => (
                 <Space size="small">
                     <PermButton
-                        perm={PERMS.role.edit}
+                        perm={PERMS.post.edit}
                         type="link"
                         size="small"
                         onClick={() => {
@@ -80,15 +72,15 @@ const RolePage: React.FC = () => {
                         编辑
                     </PermButton>
                     <PermButton
-                        perm={PERMS.role.del}
+                        perm={PERMS.post.del}
                         type="link"
                         size="small"
                         danger
                         onClick={() => {
                             Modal.confirm({
                                 title: "确认删除",
-                                content: `确定删除角色「${record.name}」？`,
-                                onOk: () => dispatch({ type: "role/remove", payload: [record.id] }),
+                                content: `确定删除岗位「${record.name}」？`,
+                                onOk: () => dispatch({ type: "post/remove", payload: [record.id] }),
                             })
                         }}
                     >
@@ -104,10 +96,10 @@ const RolePage: React.FC = () => {
             <Card size="small" style={{ marginBottom: 8 }}>
                 <Form form={form} layout="inline" style={{ flexWrap: "wrap", gap: 8 }}>
                     <Form.Item name="name">
-                        <Input placeholder="角色名称" allowClear />
+                        <Input placeholder="岗位名称" allowClear />
                     </Form.Item>
-                    <Form.Item name="key">
-                        <Input placeholder="角色标识" allowClear />
+                    <Form.Item name="code">
+                        <Input placeholder="岗位编码" allowClear />
                     </Form.Item>
                     <Form.Item name="status">
                         <Select placeholder="状态" allowClear style={{ width: 100 }}>
@@ -131,7 +123,7 @@ const RolePage: React.FC = () => {
                 <div style={{ marginBottom: 12 }}>
                     <Space>
                         <PermButton
-                            perm={PERMS.role.add}
+                            perm={PERMS.post.add}
                             type="primary"
                             icon={<PlusOutlined />}
                             onClick={() => {
@@ -139,9 +131,9 @@ const RolePage: React.FC = () => {
                                 setDrawerOpen(true)
                             }}
                         >
-                            新增角色
+                            新增岗位
                         </PermButton>
-                        <PermButton perm={PERMS.role.del} disabled={selectedRowKeys.length === 0} onClick={handleBatchRemove}>
+                        <PermButton perm={PERMS.post.del} disabled={selectedRowKeys.length === 0} onClick={handleBatchRemove}>
                             批量删除
                         </PermButton>
                     </Space>
@@ -156,17 +148,17 @@ const RolePage: React.FC = () => {
                         current: filter.current,
                         pageSize: filter.size,
                         total,
-                        onChange: (p, s) => {
-                            const payload = { current: p, size: s }
-                            dispatch({ type: "role/pageChange", payload })
-                            dispatch({ type: "role/fetchPage", payload })
+                        onChange: (page, size) => {
+                            const payload = { current: page, size }
+                            dispatch({ type: "post/pageChange", payload })
+                            dispatch({ type: "post/fetchPage", payload })
                         },
                         showSizeChanger: true,
                         showTotal: (t: number) => `共 ${t} 条`,
                     }}
                 />
             </Card>
-            <RoleDrawer
+            <PostDrawer
                 open={drawerOpen}
                 id={drawerId}
                 onClose={() => {
@@ -178,4 +170,4 @@ const RolePage: React.FC = () => {
     )
 }
 
-export default RolePage
+export default PostPage

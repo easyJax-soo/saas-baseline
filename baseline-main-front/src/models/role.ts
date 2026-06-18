@@ -2,6 +2,7 @@ import { type Reducer } from "umi"
 import Servpost from "@/utils/Servpost"
 import { IAPI } from "@/utils/ServpostInterface"
 import { message as Message } from "antd"
+import { responseData, responseOk } from "@/utils/apiResponse"
 import type { SysRolePageVO, SysRoleSaveDTO, PageResult } from "@/utils/types"
 
 const BASE = "/api/system/adminApi/role"
@@ -42,13 +43,14 @@ const RoleModel = {
         loading: { list: false, save: false, detail: false, remove: false },
     } as RoleState,
     effects: {
-        *fetchPage(_: any, { put, select }: any): any {
+        *fetchPage({ payload }: any, { put, select }: any): any {
             yield put({ type: "setLoading", payload: { key: "list", value: true } })
             try {
-                const filter = yield select((s: any) => s.role.filter)
+                const stateFilter = yield select((s: any) => s.role.filter)
+                const filter = { ...stateFilter, ...(payload || {}) }
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/page`, data: filter, methods: "post" })
-                if (res?.status === 200) {
-                    const page = res.data as PageResult<SysRolePageVO>
+                if (responseOk(res)) {
+                    const page = responseData<PageResult<SysRolePageVO>>(res)
                     yield put({ type: "saveList", payload: { list: page.records || [], total: page.total || 0 } })
                 } else {
                     Message.error(res?.message || "获取角色列表失败")
@@ -61,8 +63,8 @@ const RoleModel = {
             yield put({ type: "setLoading", payload: { key: "detail", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/detail`, data: { id: payload }, methods: "post" })
-                if (res?.status === 200) {
-                    yield put({ type: "saveDetail", payload: res.data })
+                if (responseOk(res)) {
+                    yield put({ type: "saveDetail", payload: responseData(res) })
                 } else {
                     Message.error(res?.message || "获取角色详情失败")
                 }
@@ -74,7 +76,7 @@ const RoleModel = {
             yield put({ type: "setLoading", payload: { key: "save", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/saveOrUpdate`, data: payload, methods: "post" })
-                if (res?.status === 200 && res.data !== false) {
+                if (responseOk(res)) {
                     Message.success("保存成功")
                     yield put({ type: "fetchPage" })
                     callback?.(true)
@@ -90,7 +92,7 @@ const RoleModel = {
             yield put({ type: "setLoading", payload: { key: "remove", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/remove`, data: payload, methods: "post" })
-                if (res?.status === 200 && res.data !== false) {
+                if (responseOk(res)) {
                     Message.success("删除成功")
                     yield put({ type: "fetchPage" })
                     callback?.(true)

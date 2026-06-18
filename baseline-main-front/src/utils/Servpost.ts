@@ -85,9 +85,12 @@ const requestPOST = <T extends IAPI>(params: T): Promise<any> => {
             .catch((error) => {
                 if (error?.name === "AbortError" || error?.code === "ERR_CANCELED") {
                     resolve({ data: null, status: "99999", message: "请求已取消" })
-                } else {
-                    resolve({ data: null, status: "99999", message: "请求异常" })
+                    return
                 }
+
+                const message = error?.response?.data?.message || error?.response?.data?.msg || error?.message || "请求异常"
+                const status = error?.response?.data?.status || error?.response?.status || "99999"
+                resolve({ data: error?.response?.data?.data ?? null, status, message })
             })
     })
 }

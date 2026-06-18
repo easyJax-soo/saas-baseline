@@ -1,7 +1,8 @@
 import { type Reducer } from "umi"
 import Servpost from "@/utils/Servpost"
 import { IAPI } from "@/utils/ServpostInterface"
-import type { DeptNode, SimplePostVO, ProjectTypeGroup, SysMenuNodeVO, SysPermissionNodeVO, SimpleRoleVO } from "@/utils/types"
+import { responseData, responseOk } from "@/utils/apiResponse"
+import type { DeptNode, SimplePostVO, ProjectTypeGroup, SysMenuNodeVO, SysPermissionNodeVO, SimpleRoleVO, SysDictGroupVO } from "@/utils/types"
 
 const BASE = "/api/system/adminApi"
 
@@ -12,6 +13,7 @@ export interface DictState {
     menuTree: SysMenuNodeVO[] | null
     permTree: SysPermissionNodeVO[] | null
     simpleRoles: SimpleRoleVO[] | null
+    dictGroups: SysDictGroupVO[] | null
     loading: { [key: string]: boolean }
 }
 
@@ -22,6 +24,7 @@ const initialState: DictState = {
     menuTree: null,
     permTree: null,
     simpleRoles: null,
+    dictGroups: null,
     loading: {},
 }
 
@@ -35,8 +38,8 @@ const DictModel = {
             yield put({ type: "setLoading", payload: { key: "deptTree", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/dept/list`, data: {}, methods: "post" })
-                if (res?.status === 200) {
-                    yield put({ type: "saveDict", payload: { key: "deptTree", value: res.data } })
+                if (responseOk(res)) {
+                    yield put({ type: "saveDict", payload: { key: "deptTree", value: responseData<DeptNode[]>(res) } })
                 }
             } finally {
                 yield put({ type: "setLoading", payload: { key: "deptTree", value: false } })
@@ -48,8 +51,8 @@ const DictModel = {
             yield put({ type: "setLoading", payload: { key: "postList", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/post/page`, data: { current: 1, size: 1000 }, methods: "post" })
-                if (res?.status === 200) {
-                    yield put({ type: "saveDict", payload: { key: "postList", value: res.data?.records || [] } })
+                if (responseOk(res)) {
+                    yield put({ type: "saveDict", payload: { key: "postList", value: responseData<{ records?: SimplePostVO[] }>(res)?.records || [] } })
                 }
             } finally {
                 yield put({ type: "setLoading", payload: { key: "postList", value: false } })
@@ -61,8 +64,8 @@ const DictModel = {
             yield put({ type: "setLoading", payload: { key: "projectGroups", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/project/listByType`, data: {}, methods: "post" })
-                if (res?.status === 200) {
-                    yield put({ type: "saveDict", payload: { key: "projectGroups", value: res.data } })
+                if (responseOk(res)) {
+                    yield put({ type: "saveDict", payload: { key: "projectGroups", value: responseData<ProjectTypeGroup[]>(res) } })
                 }
             } finally {
                 yield put({ type: "setLoading", payload: { key: "projectGroups", value: false } })
@@ -74,8 +77,8 @@ const DictModel = {
             yield put({ type: "setLoading", payload: { key: "menuTree", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/menu/tree`, data: {}, methods: "post" })
-                if (res?.status === 200) {
-                    yield put({ type: "saveDict", payload: { key: "menuTree", value: res.data } })
+                if (responseOk(res)) {
+                    yield put({ type: "saveDict", payload: { key: "menuTree", value: responseData<SysMenuNodeVO[]>(res) } })
                 }
             } finally {
                 yield put({ type: "setLoading", payload: { key: "menuTree", value: false } })
@@ -87,8 +90,8 @@ const DictModel = {
             yield put({ type: "setLoading", payload: { key: "permTree", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/sysPermission/tree`, data: {}, methods: "post" })
-                if (res?.status === 200) {
-                    yield put({ type: "saveDict", payload: { key: "permTree", value: res.data } })
+                if (responseOk(res)) {
+                    yield put({ type: "saveDict", payload: { key: "permTree", value: responseData<SysPermissionNodeVO[]>(res) } })
                 }
             } finally {
                 yield put({ type: "setLoading", payload: { key: "permTree", value: false } })
@@ -100,11 +103,24 @@ const DictModel = {
             yield put({ type: "setLoading", payload: { key: "simpleRoles", value: true } })
             try {
                 const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/role/list`, data: {}, methods: "get" })
-                if (res?.status === 200) {
-                    yield put({ type: "saveDict", payload: { key: "simpleRoles", value: res.data } })
+                if (responseOk(res)) {
+                    yield put({ type: "saveDict", payload: { key: "simpleRoles", value: responseData<SimpleRoleVO[]>(res) } })
                 }
             } finally {
                 yield put({ type: "setLoading", payload: { key: "simpleRoles", value: false } })
+            }
+        },
+        *loadDictGroups(_: any, { put, select }: any): any {
+            const state = yield select((s: any) => s.dict)
+            if (state.dictGroups) return
+            yield put({ type: "setLoading", payload: { key: "dictGroups", value: true } })
+            try {
+                const res: any = yield Servpost.requestRace<IAPI>({ url: `${BASE}/dict/groups`, data: {}, methods: "post" })
+                if (responseOk(res)) {
+                    yield put({ type: "saveDict", payload: { key: "dictGroups", value: responseData<SysDictGroupVO[]>(res) } })
+                }
+            } finally {
+                yield put({ type: "setLoading", payload: { key: "dictGroups", value: false } })
             }
         },
         *invalidate({ payload }: any, { put }: any): any {
